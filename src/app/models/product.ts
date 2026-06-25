@@ -1,0 +1,30 @@
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  category_id: string | null;
+  price_range_id: number | null;
+  image_url: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  prices: {
+    id?: string;
+    product_id?: string;
+    price: number;
+    start_day: number | null;
+    end_day: number | null;
+    start_datetime: string | null;
+    end_datetime: string | null;
+    rule_type: 'DAY' | 'PROMOTION';
+  }[];
+}
+
+export interface ProductFormData {
+  name: string;
+  description: string;
+  categoryId: string | null;
+  basePrice: number;
+  status: boolean;
+}
