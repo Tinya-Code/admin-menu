@@ -1,0 +1,40 @@
+<div
+  class="fixed bottom-10 mx-4 md:bottom-0 left-0 right-0 z-40 bg-white/60 backdrop-blur-sm border-t border-gray-200 p-4 shadow md:left-64"
+>
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <!-- Warning cambios -->
+    @if (hasChanges()) {
+      <div
+        class="flex items-center gap-2 rounded-md border border-yellow-300 bg-yellow-50 p-2 md:p-3 text-xs md:text-sm text-yellow-800"
+      >
+        <svg LucideTriangleAlert class="h-4 w-4"></svg>
+        <span>Tienes cambios sin guardar</span>
+      </div>
+    }
+
+    <!-- Botones -->
+    <div class="flex items-center gap-3 w-full md:w-auto">
+      <button
+        type="button"
+        (click)="onCancel()"
+        [disabled]="isSaving() || !hasChanges()"
+        class="flex-1 md:flex-none rounded-md border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 transition-colors"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        (click)="onSave()"
+        [disabled]="isSaving() || !hasChanges() || !isValid()"
+        class="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-md bg-gray-900 px-6 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-all shadow-sm"
+      >
+        <div
+          *ngIf="isSaving()"
+          class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+        ></div>
+        {{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,149 @@
+<div class="min-h-screen bg-gray-50 md:p-6">
+  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Configuración</h1>
+      <p class="text-sm text-gray-600">Gestiona la configuración de tu restaurante</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center py-20">
+      <div
+        class="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-gray-800"
+      ></div>
+      <p class="mt-4 text-gray-600">Cargando configuración...</p>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (!isLoading()) {
+    <div class="space-y-6">
+      <!-- Tabs - Responsive with horizontal scroll on small screens -->
+      <div class="flex gap-2 border-b border-gray-200 pb-2 overflow-x-auto scrollbar-hide">
+        @for (tab of tabs; track tab.id) {
+          <button
+            type="button"
+            (click)="switchTab(tab.id)"
+            class="flex items-center gap-1 sm:gap-2 rounded-md px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium transition whitespace-nowrap shrink-0"
+            [class.bg-gray-900]="activeTab() === tab.id"
+            [class.text-white]="activeTab() === tab.id"
+            [class.text-gray-700]="activeTab() !== tab.id"
+            [class.hover:bg-gray-200]="activeTab() !== tab.id"
+          >
+            <svg [lucideIcon]="tab.icon" class="h-4 w-4 sm:h-[18px] sm:w-[18px] shrink-0"></svg>
+
+            <span>{{ tab.label }}</span>
+            @if (tabValidation()[tab.id] === false && activeTab() !== tab.id) {
+              <svg LucideAlertTriangle class="h-3 w-3 sm:h-[16px] sm:w-[16px] text-red-500"></svg>
+            }
+          </button>
+        }
+      </div>
+
+      <!-- Panel Restaurante -->
+      <div
+        class="rounded-lg bg-white p-4 md:p-6 shadow-sm"
+        [class.hidden]="activeTab() !== 'restaurant'"
+      >
+        <div class="mb-4 flex items-center gap-2">
+          <h2 class="text-lg font-semibold">Información del Restaurante</h2>
+        </div>
+
+        <p class="mb-6 text-sm text-gray-600">
+          Configura la información básica y ubicación de tu restaurante
+        </p>
+
+        <app-restaurant-config
+          [config]="restaurantConfig()"
+          [settingsConfig]="settingsConfig()"
+          (configChange)="onConfigChange('restaurant_config', $event)"
+          (isValid)="onTabValidation('restaurant', $event)"
+        ></app-restaurant-config>
+      </div>
+
+      <!-- Panel WhatsApp -->
+      <div
+        class="rounded-lg bg-white p-4 md:p-6 shadow-sm"
+        [class.hidden]="activeTab() !== 'whatsapp'"
+      >
+        <div class="mb-4 flex items-center gap-2">
+          <svg LucideMessageCircle class="h-5 w-5"></svg>
+          <h2 class="text-lg font-semibold">Configuración de WhatsApp</h2>
+        </div>
+
+        <p class="mb-6 text-sm text-gray-600">
+          Configura la integración con WhatsApp para recibir pedidos
+        </p>
+
+        <app-whatsapp-config
+          [config]="whatsappConfig()"
+          (configChange)="onConfigChange('whatsapp_config', $event)"
+          (isValid)="onTabValidation('whatsapp', $event)"
+        ></app-whatsapp-config>
+      </div>
+
+      <!-- Panel Órdenes -->
+      <div
+        class="rounded-lg bg-white md:p-6 p-4 shadow-sm"
+        [class.hidden]="activeTab() !== 'order'"
+      >
+        <div class="mb-4 flex items-center gap-2">
+          <svg LucideClipboardList class="h-5 w-5"></svg>
+          <h2 class="text-lg font-semibold">Configuración de Órdenes</h2>
+        </div>
+
+        <p class="mb-6 text-sm text-gray-600">
+          Gestiona las opciones de pedidos, delivery y métodos de pago
+        </p>
+
+        <app-order-config
+          [config]="orderConfig()"
+          (configChange)="onConfigChange('order_config', $event)"
+          (isValid)="onTabValidation('order', $event)"
+        ></app-order-config>
+      </div>
+
+      <!-- Panel Negocio -->
+      <div
+        class="rounded-lg bg-white md:p-6 p-4 shadow-sm"
+        [class.hidden]="activeTab() !== 'business'"
+      >
+        <div class="mb-4 flex items-center gap-2">
+          <svg LucideBuilding class="h-5 w-5"></svg>
+          <h2 class="text-lg font-semibold">Configuración del Negocio</h2>
+        </div>
+
+        <p class="mb-6 text-sm text-gray-600">
+          Administra horarios, zonas de delivery y redes sociales
+        </p>
+
+        <app-business-config
+          [config]="businessConfig()"
+          (configChange)="onConfigChange('business_config', $event)"
+          (isValid)="onTabValidation('business', $event)"
+        ></app-business-config>
+      </div>
+    </div>
+
+    <!-- Botón Guardar -->
+    <div
+      class="fixed bottom-4 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:bottom-8 md:right-8 z-40"
+    >
+      <button
+        type="button"
+        (click)="saveSettings()"
+        [disabled]="!hasChanges() || !isFormValid() || isSaving()"
+        class="flex items-center justify-center gap-2 rounded-full bg-gray-900 px-6 py-3 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+      >
+        @if (isSaving()) {
+          <div
+            class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+          ></div>
+        }
+        {{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}
+      </button>
+    </div>
+  }
+</div>

@@ -1,0 +1,98 @@
+<form [formGroup]="restaurantForm" class="md:p-6 bg-surface">
+  <div class="space-y-8">
+    <!-- Información del Restaurante -->
+    <div class="space-y-4">
+      <!-- Nombre -->
+      <div class="space-y-1.5">
+        <label for="name" class="block text-sm font-medium text-gray-700 mb-2"> Nombre * </label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none placeholder:text-gray-300 text-sm md:text-base"
+          placeholder="Ej: Mi Restaurante"
+        />
+        @if (getNameErrorMessage()) {
+          <div class="mt-1 text-[11px] font-medium text-red-500 px-1 animate-in fade-in">
+            {{ getNameErrorMessage() }}
+          </div>
+        }
+      </div>
+
+      <!-- Teléfono -->
+      <div class="space-y-1.5">
+        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2"> Teléfono </label>
+        <input
+          id="phone"
+          type="tel"
+          formControlName="phone"
+          class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none placeholder:text-gray-300 text-sm md:text-base"
+          placeholder="Ej: +51 987 654 321"
+        />
+        @if (getPhoneErrorMessage()) {
+          <div class="mt-1 text-[11px] font-medium text-red-500 px-1 animate-in fade-in">
+            {{ getPhoneErrorMessage() }}
+          </div>
+        }
+      </div>
+
+      <!-- Dirección -->
+      <div class="space-y-1.5">
+        <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
+          Dirección *
+        </label>
+        <textarea
+          id="address"
+          formControlName="address"
+          rows="2"
+          class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none placeholder:text-gray-300 text-sm md:text-base resize-none"
+          placeholder="Ej: Av. Principal 123, Lima"
+        ></textarea>
+        @if (getAddressErrorMessage()) {
+          <div class="mt-1 text-[11px] font-medium text-red-500 px-1 animate-in fade-in">
+            {{ getAddressErrorMessage() }}
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Ubicación en Mapa -->
+    <div class="mb-8">
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-900">Ubicación</h3>
+        <p class="text-xs text-gray-400 mt-1">
+          Selecciona la ubicación del restaurante en el mapa. Haz clic para mover el marcador.
+        </p>
+      </div>
+
+      <!-- Map Container -->
+      <app-map-picker
+        [location]="restaurantForm.get('location')?.value"
+        (locationChange)="onLocationChange($event)"
+      ></app-map-picker>
+
+      <!-- Location Coordinates Display -->
+      <div class="mt-4 flex items-center gap-4 text-sm">
+        <div class="flex items-center gap-2">
+          <svg lucideMapPin class="w-4 h-4 text-gray-400"></svg>
+          <span class="text-gray-500">Lat:</span>
+          <span class="font-medium text-gray-700">
+            {{ restaurantForm.get('location.lat')?.value?.toFixed(6) || '0.000000' }}
+          </span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-gray-500">Lng:</span>
+          <span class="font-medium text-gray-700">
+            {{ restaurantForm.get('location.lng')?.value?.toFixed(6) || '0.000000' }}
+          </span>
+        </div>
+      </div>
+
+      @if (getLocationErrorMessage()) {
+        <div class="mt-3 text-[11px] font-medium text-red-500 px-1 animate-in fade-in">
+          {{ getLocationErrorMessage() }}
+        </div>
+      }
+    </div>
+  </div>
+</form>
