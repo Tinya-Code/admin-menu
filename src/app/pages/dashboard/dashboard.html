@@ -1,0 +1,54 @@
+<div class="max-w-6xl">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+    <p class="text-sm text-gray-500 mt-1">Resumen del panel de administración</p>
+  </div>
+
+  <!-- Error -->
+  @if (apiError(); as error) {
+    <div class="mb-6 flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+      <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+      </svg>
+      <div class="flex-1">{{ error }}</div>
+      <button
+        class="text-red-700 underline hover:text-red-800 whitespace-nowrap text-xs font-medium"
+        (click)="loadStats()"
+      >
+        Reintentar
+      </button>
+    </div>
+  }
+
+  @if (loading() && !apiError()) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      @for (placeholder of [1,2,3,4]; track placeholder) {
+        <div class="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gray-200"></div>
+            <div class="flex-1">
+              <div class="h-3 bg-gray-200 rounded w-20 mb-2"></div>
+              <div class="h-6 bg-gray-200 rounded w-12"></div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (stats().length > 0) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      @for (stat of stats(); track stat.label) {
+        <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" [class]="stat.bgColor + ' ' + stat.color">
+              <span [innerHTML]="stat.icon"></span>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">{{ stat.label }}</p>
+              <p class="text-2xl font-bold text-gray-900 mt-1">{{ stat.value }}</p>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
