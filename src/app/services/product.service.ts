@@ -15,7 +15,7 @@ interface MessageResponse {
 @Injectable({ providedIn: 'root' })
 export class ProductService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/products`;
+  private apiUrl = `${environment.apiURL}/products`;
 
   getAll(): Observable<DataResponse<Product[]>> {
     return this.http.get<DataResponse<Product[]>>(this.apiUrl);

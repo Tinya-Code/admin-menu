@@ -31,6 +31,16 @@ export class Categories implements OnInit {
   protected deletingId = signal<string | null>(null);
   protected deleting = signal(false);
 
+  blockOptions = signal([
+    { id: 'block-1', label: 'Block 1' },
+    { id: 'block-2', label: 'Block 2' },
+    { id: 'block-3', label: 'Block 3' },
+    { id: 'block-4', label: 'Block 4' },
+    { id: 'block-5', label: 'Block 5' },
+    { id: 'block-6', label: 'Block 6' },
+    { id: 'block-7', label: 'Block 7' }
+  ]);
+
   ngOnInit(): void {
     this.loadCategories();
   }

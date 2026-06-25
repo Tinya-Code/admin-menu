@@ -10,7 +10,7 @@ import { BusinessSettings, SettingsResponse } from '../models/settings';
 })
 export class SettingsService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/settings`;
+  private readonly apiUrl = `${environment.apiURL}/settings`;
 
   private readonly _cache = signal<BusinessSettings | null>(null);
   private readonly _lastFetchTime = signal<number>(0);
