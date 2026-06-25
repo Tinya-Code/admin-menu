@@ -15,7 +15,7 @@ interface MessageResponse {
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/categories`;
+  private apiUrl = `${environment.apiURL}/categories`;
 
   getAll(): Observable<DataResponse<Category[]>> {
     return this.http.get<DataResponse<Category[]>>(this.apiUrl);

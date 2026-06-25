@@ -27,7 +27,7 @@ export class AuthService {
   ready$: Observable<boolean> = this.readySubject.asObservable();
 
   constructor() {
-    const app = initializeApp(environment.firebase);
+    const app = initializeApp(environment.firebaseConfig);
     this.auth = getAuth(app);
 
     onAuthStateChanged(this.auth, (firebaseUser: User | null) => {
