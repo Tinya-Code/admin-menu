@@ -6,11 +6,18 @@ import { Button } from '../../components/shared/button';
 import { Modal } from '../../components/shared/modal';
 import { ConfirmDialog } from '../../components/shared/confirm-dialog';
 import { SearchInput } from '../../components/shared/search-input';
+import {
+  LucidePlus,
+  LucideAlertTriangle,
+  LucideInbox,
+  LucidePencil,
+  LucideTrash2,
+} from '@lucide/angular';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [FormsModule, Button, Modal, ConfirmDialog, SearchInput],
+  imports: [FormsModule, Button, Modal, ConfirmDialog, SearchInput, LucidePlus, LucideAlertTriangle, LucideInbox, LucidePencil, LucideTrash2],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {
@@ -32,13 +39,13 @@ export class Categories implements OnInit {
   protected deleting = signal(false);
 
   blockOptions = signal([
-    { id: 'block-1', label: 'Block 1' },
-    { id: 'block-2', label: 'Block 2' },
-    { id: 'block-3', label: 'Block 3' },
-    { id: 'block-4', label: 'Block 4' },
-    { id: 'block-5', label: 'Block 5' },
-    { id: 'block-6', label: 'Block 6' },
-    { id: 'block-7', label: 'Block 7' }
+    { id: 'block-1', label: 'Bloque 1' },
+    { id: 'block-2', label: 'Bloque 2' },
+    { id: 'block-3', label: 'Bloque 3' },
+    { id: 'block-4', label: 'Bloque 4' },
+    { id: 'block-5', label: 'Bloque 5' },
+    { id: 'block-6', label: 'Bloque 6' },
+    { id: 'block-7', label: 'Bloque 7' }
   ]);
 
   ngOnInit(): void {
@@ -140,5 +147,9 @@ export class Categories implements OnInit {
         this.apiError.set('Error al eliminar la categoría. Intenta de nuevo.');
       },
     });
+  }
+
+  protected getBlockLabel(blockId: string): string {
+    return this.blockOptions().find((b) => b.id === blockId)?.label ?? blockId;
   }
 }

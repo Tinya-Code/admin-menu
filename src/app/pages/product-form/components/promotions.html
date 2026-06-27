@@ -1,0 +1,156 @@
+<div class="bg-white rounded-xl border border-gray-200 p-5">
+  @if (!showForm()) {
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <h4 class="text-sm font-semibold text-gray-900">Promociones</h4>
+        <p class="text-xs text-gray-400">Define precios promocionales para fechas específicas.</p>
+      </div>
+    </div>
+
+    @if (promotions().length === 0) {
+      <p class="text-xs text-gray-400 py-3 text-center">No hay promociones configuradas.</p>
+    }
+
+    <div class="space-y-2 mb-3">
+      @for (promo of sortedPromotions(); track $index) {
+        <div class="bg-gray-50 rounded-lg border border-gray-200 p-3">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-900">{{ promo.name }}</p>
+              <p class="text-sm text-gray-600 mt-0.5">S/{{ promo.price.toFixed(2) }}</p>
+              <p class="text-xs text-gray-400 mt-1">
+                {{ formatDate(promo.startDate) }}
+                <span class="text-gray-400 mx-1">-</span>
+                {{ formatDate(promo.endDate) }}
+              </p>
+            </div>
+            <div class="flex items-center gap-1">
+              @if (confirmDeleteIndex() !== null && promotions()[confirmDeleteIndex()!] === promo) {
+                <span class="text-xs text-gray-500 mr-1">¿Eliminar?</span>
+                <button
+                  type="button"
+                  class="text-xs text-red-600 font-medium hover:underline"
+                  (click)="onConfirmDelete()"
+                >
+                  Sí
+                </button>
+                <span class="text-xs text-gray-300 mx-1">|</span>
+                <button
+                  type="button"
+                  class="text-xs text-gray-500 font-medium hover:underline"
+                  (click)="onCancelDelete()"
+                >
+                  No
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="p-1.5 text-gray-400 hover:text-primary transition-colors"
+                  (click)="onEdit(promo)"
+                  title="Editar"
+                >
+                  <svg lucidePencil class="w-3.5 h-3.5"></svg>
+                </button>
+                <button
+                  type="button"
+                  class="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+                  (click)="onRequestDelete(promo)"
+                  title="Eliminar"
+                >
+                  <svg lucideTrash2 class="w-3.5 h-3.5"></svg>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <button
+      type="button"
+      class="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary hover:text-primary transition-colors"
+      (click)="openForm()"
+    >
+      + Agregar promoción
+    </button>
+  } @else {
+    <div>
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-sm font-semibold text-gray-900">
+          {{ editingItem() ? 'Editar promoción' : 'Nueva promoción' }}
+        </h4>
+      </div>
+
+      <div class="space-y-3" [formGroup]="form">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Nombre de promoción</label>
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="Ej: Fiestas Patrias"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Precio promocional</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">S/</span>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              formControlName="price"
+              placeholder="0.00"
+              class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Fecha inicio</label>
+            <input
+              type="datetime-local"
+              formControlName="startDate"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Fecha fin</label>
+            <input
+              type="datetime-local"
+              formControlName="endDate"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+          </div>
+        </div>
+        @if (form.errors?.['startDateBeforeToday'] && form.get('startDate')?.touched) {
+          <p class="text-xs text-red-600">
+            La fecha de inicio no puede ser anterior al día de hoy.
+          </p>
+        }
+        @if (form.errors?.['startDateAfterEndDate'] && form.get('endDate')?.touched) {
+          <p class="text-xs text-red-600">
+            La fecha de inicio no puede ser posterior a la fecha de fin.
+          </p>
+        }
+        <div class="flex gap-2 pt-1">
+          <button
+            type="button"
+            class="flex-1 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:brightness-110 transition-all disabled:opacity-50"
+            [disabled]="!form.valid"
+            (click)="onSave()"
+          >
+            Guardar
+          </button>
+          <button
+            type="button"
+            class="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+            (click)="onCancelForm()"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

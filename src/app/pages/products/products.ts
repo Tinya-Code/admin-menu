@@ -8,11 +8,19 @@ import { Category } from '../../models/category';
 import { Button } from '../../components/shared/button';
 import { ConfirmDialog } from '../../components/shared/confirm-dialog';
 import { SearchInput } from '../../components/shared/search-input';
+import {
+  LucidePlus,
+  LucideTriangleAlert,
+  LucidePackage,
+  LucideImage,
+  LucidePencil,
+  LucideTrash2,
+} from '@lucide/angular';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [Button, ConfirmDialog, SearchInput],
+  imports: [Button, ConfirmDialog, SearchInput, LucidePlus, LucideTriangleAlert, LucidePackage, LucideImage, LucidePencil, LucideTrash2],
   templateUrl: './products.html',
 })
 export class Products implements OnInit {

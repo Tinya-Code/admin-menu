@@ -47,12 +47,17 @@ export class OrderConfig implements OnInit {
       this.orderForm.patchValue(this.config(), { emitEvent: false });
     }
 
+    this.updateDeliveryFeeDisabled();
     this.setupFormListeners();
     // Emit initial status
     this.isValid.emit(this.orderForm.valid);
   }
 
   private setupFormListeners(): void {
+    this.orderForm.get('delivery_enabled')?.valueChanges.subscribe(() => {
+      this.updateDeliveryFeeDisabled();
+    });
+
     this.orderForm.valueChanges.subscribe((values) => {
       const isValid = this.orderForm.valid;
       this.isValid.emit(isValid);
@@ -60,6 +65,15 @@ export class OrderConfig implements OnInit {
       // Always emit changes to enable the save button
       this.configChange.emit({ ...this.config(), ...values } as OrderConfigModel);
     });
+  }
+
+  private updateDeliveryFeeDisabled(): void {
+    const deliveryFeeControl = this.orderForm.get('delivery_fee');
+    if (this.orderForm.get('delivery_enabled')?.value) {
+      deliveryFeeControl?.enable();
+    } else {
+      deliveryFeeControl?.disable();
+    }
   }
 
   get isFormEnabled(): boolean {
