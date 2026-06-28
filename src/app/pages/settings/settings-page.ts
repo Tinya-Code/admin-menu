@@ -258,6 +258,7 @@ export class SettingsPage implements OnInit, OnDestroy {
           this.currentSettings.set(configRes);
           this.hasUnsavedChanges.set(false);
           this.saving.set(false);
+          this.settingsService.clearSettingsCache();
         },
         error: () => {
           this.showError('Ocurrió un error al guardar los cambios');
