@@ -6,6 +6,7 @@ import { Button } from '../../components/shared/button';
 import { Modal } from '../../components/shared/modal';
 import { ConfirmDialog } from '../../components/shared/confirm-dialog';
 import { SearchInput } from '../../components/shared/search-input';
+import { ImageUploader } from '../../components/shared/image-uploader';
 import {
   LucidePlus,
   LucideAlertTriangle,
@@ -17,7 +18,7 @@ import {
 @Component({
   selector: 'app-combos',
   standalone: true,
-  imports: [FormsModule, Button, Modal, ConfirmDialog, SearchInput, LucidePlus, LucideAlertTriangle, LucideInbox, LucidePencil, LucideTrash2],
+  imports: [FormsModule, Button, Modal, ConfirmDialog, SearchInput, ImageUploader, LucidePlus, LucideAlertTriangle, LucideInbox, LucidePencil, LucideTrash2],
   templateUrl: './combos.html',
 })
 export class Combos implements OnInit {
@@ -33,6 +34,7 @@ export class Combos implements OnInit {
   protected editingCombo = signal<Combo | null>(null);
   protected saving = signal(false);
   protected form: ComboForm = { name: '', description: '', price: 0 };
+  protected selectedImage: File | null = null;
 
   protected deleteDialogOpen = signal(false);
   protected deletingId = signal<string | null>(null);
@@ -76,6 +78,7 @@ export class Combos implements OnInit {
   protected openCreate(): void {
     this.editingCombo.set(null);
     this.form = { name: '', description: '', price: 0 };
+    this.selectedImage = null;
     this.modalOpen.set(true);
   }
 
@@ -86,6 +89,7 @@ export class Combos implements OnInit {
       description: combo.description,
       price: combo.price,
     };
+    this.selectedImage = null;
     this.modalOpen.set(true);
   }
 
@@ -93,13 +97,25 @@ export class Combos implements OnInit {
     this.modalOpen.set(false);
   }
 
+  protected onImageChange(file: File | null): void {
+    this.selectedImage = file;
+  }
+
   protected save(): void {
     if (!this.form.name.trim()) return;
     this.saving.set(true);
 
+    const formData = new FormData();
+    formData.append('name', this.form.name);
+    formData.append('description', this.form.description || '');
+    formData.append('price', String(this.form.price));
+    if (this.selectedImage) {
+      formData.append('image', this.selectedImage);
+    }
+
     const request = this.editingCombo()
-      ? this.comboService.update(this.editingCombo()!.id, this.form)
-      : this.comboService.create(this.form);
+      ? this.comboService.update(this.editingCombo()!.id, formData)
+      : this.comboService.create(formData);
 
     request.subscribe({
       next: () => {
