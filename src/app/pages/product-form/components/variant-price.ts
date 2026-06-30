@@ -6,7 +6,7 @@ export interface PriceRangeData {
   id?: string;
   quantity: number;
   unit: string;
-  price: number;
+  price: number | null;
   bonus: string;
   sort_order: number;
   is_default: boolean;
@@ -46,8 +46,7 @@ export class VariantPrice {
       validators: [Validators.required, Validators.min(0.01)],
     }),
     unit: new FormControl('unidad', { nonNullable: true }),
-    price: new FormControl(0, {
-      nonNullable: true,
+    price: new FormControl<number | null>(null, {
       validators: [Validators.required, Validators.min(0.01)],
     }),
     bonus: new FormControl('', { nonNullable: true }),
@@ -61,7 +60,7 @@ export class VariantPrice {
   openForm(): void {
     this.form.quantity.setValue(1);
     this.form.unit.setValue('unidad');
-    this.form.price.setValue(0);
+    this.form.price.setValue(null);
     this.form.bonus.setValue('');
     this.form.is_default.setValue(false);
     this.editingItem.set(null);
