@@ -134,6 +134,9 @@
           </div>
 
           <div class="flex flex-col gap-6">
+            <!-- ============ PRESENTACIONES / PRECIOS POR CANTIDAD ============ -->
+            <app-variant-price [(priceRanges)]="priceRanges" />
+
             <!-- ============ PRECIOS POR DÍA ============ -->
             <app-day-prices [(dayGroups)]="dayGroups" />
 

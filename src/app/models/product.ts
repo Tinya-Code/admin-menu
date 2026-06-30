@@ -19,6 +19,15 @@ export interface Product {
     end_datetime: string | null;
     rule_type: 'DAY' | 'PROMOTION';
   }[];
+  price_ranges?: {
+    id?: string;
+    quantity: number;
+    unit: string;
+    price: number;
+    bonus: string | null;
+    sort_order: number;
+    is_default: boolean;
+  }[];
 }
 
 export interface ProductFormData {
