@@ -33,6 +33,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/product-form/product-form').then((m) => m.ProductForm),
       },
       {
+        path: 'combos',
+        loadComponent: () => import('./pages/combos/combos').then((m) => m.Combos),
+      },
+      {
         path: 'settings',
         loadComponent: () => import('./pages/settings/settings-page').then((m) => m.SettingsPage),
       },

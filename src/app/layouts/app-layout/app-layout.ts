@@ -2,6 +2,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import {
+  LucideBoxes,
   LucideDynamicIcon,
   LucideFolderTree,
   LucideHouse,
@@ -33,6 +34,7 @@ export class AppLayout {
     { label: 'Dashboard', path: '/dashboard', icon: LucideHouse },
     { label: 'Categorías', path: '/categories', icon: LucideFolderTree },
     { label: 'Productos', path: '/products', icon: LucidePackage },
+    { label: 'Combos', path: '/combos', icon: LucideBoxes },
     { label: 'Configuración', path: '/settings', icon: LucideSettings },
   ];
 
