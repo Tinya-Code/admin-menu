@@ -15,11 +15,12 @@ import { ProductService } from '../../services/product.service';
 import { ToastService } from '../../services/toast.service';
 import { DayPrices, DayGroupData } from './components/day-prices';
 import { Promotions, PromotionData } from './components/promotions';
+import { VariantPrice, PriceRangeData } from './components/variant-price';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [ReactiveFormsModule, Button, ImageUploader, DayPrices, Promotions],
+  imports: [ReactiveFormsModule, Button, ImageUploader, DayPrices, Promotions, VariantPrice],
   templateUrl: './product-form.html',
 })
 export class ProductForm implements OnInit {
@@ -44,6 +45,8 @@ export class ProductForm implements OnInit {
   protected dayGroups = signal<DayGroupData[]>([]);
 
   protected promotions = signal<PromotionData[]>([]);
+
+  protected priceRanges = signal<PriceRangeData[]>([]);
 
   constructor() {
     this.productForm = this.fb.group({
@@ -113,6 +116,20 @@ export class ProductForm implements OnInit {
         }
         this.dayGroups.set(dayPrices);
         this.promotions.set(promos);
+
+        const ranges: PriceRangeData[] = (product.price_ranges ?? []).map(
+          (r: any) => ({
+            id: r.id,
+            quantity: r.quantity,
+            unit: r.unit,
+            price: r.price,
+            bonus: r.bonus ?? '',
+            sort_order: r.sort_order ?? 0,
+            is_default: r.is_default ?? false,
+          })
+        );
+        this.priceRanges.set(ranges);
+
         this.loading.set(false);
       },
       error: () => {
@@ -178,6 +195,20 @@ export class ProductForm implements OnInit {
         prices.push(entry);
       }
       formData.append('prices', JSON.stringify(prices));
+
+      const priceRangesPayload = this.priceRanges().map((r, i) => {
+        const entry: any = {
+          quantity: r.quantity,
+          unit: r.unit,
+          price: r.price,
+          bonus: r.bonus || null,
+          sort_order: i,
+          is_default: r.is_default ? 1 : 0,
+        };
+        if (r.id) entry.id = r.id;
+        return entry;
+      });
+      formData.append('price_ranges', JSON.stringify(priceRangesPayload));
 
       const productId = this.route.snapshot.paramMap.get('id');
       if (productId) {
