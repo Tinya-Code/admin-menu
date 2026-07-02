@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import {
   LucideBoxes,
+  LucideCalendarDays,
   LucideDynamicIcon,
   LucideFolderTree,
   LucideHouse,
@@ -35,6 +36,7 @@ export class AppLayout {
     { label: 'Categorías', path: '/categories', icon: LucideFolderTree },
     { label: 'Productos', path: '/products', icon: LucidePackage },
     { label: 'Combos', path: '/combos', icon: LucideBoxes },
+    { label: 'Eventos', path: '/events', icon: LucideCalendarDays },
     { label: 'Configuración', path: '/settings', icon: LucideSettings },
   ];
 

@@ -1,0 +1,339 @@
+<div class="max-w-5xl">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Eventos</h1>
+      <p class="text-sm text-gray-500 mt-1">Administra los eventos</p>
+    </div>
+    <app-button (onClick)="openCreate()">
+      <svg lucidePlus class="w-4 h-4"></svg>
+      Nuevo evento
+    </app-button>
+  </div>
+
+  <!-- Search -->
+  <div class="mb-6 w-full md:max-w-xs">
+    <app-search-input
+      [searchTerm]="searchTerm()"
+      placeholder="Buscar eventos..."
+      (onSearch)="onSearch($event)"
+    />
+  </div>
+
+  <!-- Error -->
+  @if (apiError(); as error) {
+    <div
+      class="mb-6 flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700"
+    >
+      <svg lucideAlertTriangle class="w-5 h-5 shrink-0"></svg>
+      <div class="flex-1">{{ error }}</div>
+      <button
+        class="text-red-700 underline hover:text-red-800 whitespace-nowrap text-xs font-medium"
+        (click)="loadEvents()"
+      >
+        Reintentar
+      </button>
+    </div>
+  }
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+      @for (placeholder of [1, 2, 3]; track placeholder) {
+        <div class="p-4 animate-pulse flex items-center gap-4">
+          <div class="w-12 h-12 bg-gray-200 rounded-lg shrink-0"></div>
+          <div class="flex-1 space-y-2">
+            <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+            <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+          </div>
+          <div class="flex gap-2">
+            <div class="w-8 h-8 bg-gray-200 rounded-lg"></div>
+            <div class="w-8 h-8 bg-gray-200 rounded-lg"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (events().length === 0) {
+    <!-- Empty -->
+    <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
+      <svg lucideInbox class="w-12 h-12 mx-auto text-gray-300 mb-4"></svg>
+      <p class="text-gray-500 font-medium">No hay eventos</p>
+      <p class="text-sm text-gray-400 mt-1">Crea tu primer evento para empezar</p>
+    </div>
+  } @else {
+    <!-- Desktop table -->
+    <div class="hidden sm:block bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <table class="w-full">
+        <thead>
+          <tr class="bg-gray-50 border-b border-gray-200">
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Imagen
+            </th>
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Nombre
+            </th>
+            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Descripción
+            </th>
+            <th class="text-center px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Fecha y hora
+            </th>
+            <th class="text-center px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (evt of events(); track evt.id) {
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4">
+                @if (evt.image_url) {
+                  <div class="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 bg-white">
+                    <img [src]="evt.image_url" [alt]="evt.name" class="w-full h-full object-cover" />
+                  </div>
+                } @else {
+                  <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                }
+              </td>
+              <td class="px-6 py-4">
+                <p class="text-sm font-medium text-gray-900">{{ evt.name }}</p>
+              </td>
+              <td class="px-6 py-4">
+                <p class="text-sm text-gray-500 truncate max-w-xs">{{ evt.description }}</p>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <span class="text-sm text-gray-600">{{ formatDateTime(evt.date) }}</span>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-center gap-2">
+                  <button
+                    class="p-2 text-gray-400 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 rounded-lg transition-colors"
+                    (click)="openEdit(evt)"
+                    title="Editar"
+                  >
+                    <svg lucidePencil class="w-4 h-4"></svg>
+                  </button>
+                  <button
+                    class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    (click)="confirmDelete(evt)"
+                    title="Eliminar"
+                  >
+                    <svg lucideTrash2 class="w-4 h-4"></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile cards -->
+    <div class="sm:hidden space-y-3">
+      @for (evt of events(); track evt.id) {
+        <div class="bg-white rounded-xl border border-gray-200 p-4">
+          <div class="flex items-start gap-3">
+            @if (evt.image_url) {
+              <div class="w-14 h-14 rounded-lg overflow-hidden border border-gray-200 shrink-0 bg-white">
+                <img [src]="evt.image_url" [alt]="evt.name" class="w-full h-full object-cover" />
+              </div>
+            }
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900">{{ evt.name }}</p>
+              @if (evt.description) {
+                <p class="text-xs text-gray-500 mt-1 truncate">{{ evt.description }}</p>
+              }
+              <p class="text-xs text-gray-400 mt-1">{{ formatDateTime(evt.date) }}</p>
+            </div>
+            <div class="flex gap-1 shrink-0">
+              <button
+                class="p-2 text-gray-400 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 rounded-lg transition-colors"
+                (click)="openEdit(evt)"
+              >
+                <svg lucidePencil class="w-4 h-4"></svg>
+              </button>
+              <button
+                class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                (click)="confirmDelete(evt)"
+              >
+                <svg lucideTrash2 class="w-4 h-4"></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (meta(); as m) {
+      <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-sm text-gray-500">
+          Mostrando {{ m.total_items === 0 ? 0 : ((m.current_page - 1) * m.limit + 1) }}
+          — {{ m.current_page * m.limit > m.total_items ? m.total_items : m.current_page * m.limit }}
+          de {{ m.total_items }} resultados
+        </p>
+        <div class="flex items-center gap-1">
+          <button
+            class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            [disabled]="!m.has_prev"
+            (click)="goToPage(m.current_page - 1)"
+          >
+            <svg lucideChevronLeft class="w-4 h-4"></svg>
+          </button>
+          @for (page of visiblePages; track page) {
+            <button
+              class="min-w-[36px] h-9 rounded-lg text-sm font-medium transition-colors"
+              [class.bg-[var(--color-primary)]]="page === m.current_page"
+              [class.text-white]="page === m.current_page"
+              [class.text-gray-700]="page !== m.current_page"
+              [class.hover:bg-gray-100]="page !== m.current_page"
+              (click)="goToPage(page)"
+            >
+              {{ page }}
+            </button>
+          }
+          <button
+            class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            [disabled]="!m.has_next"
+            (click)="goToPage(m.current_page + 1)"
+          >
+            <svg lucideChevronRight class="w-4 h-4"></svg>
+          </button>
+        </div>
+      </div>
+    }
+  }
+</div>
+
+<!-- Create/Edit Modal -->
+<app-modal
+  [open]="modalOpen()"
+  [title]="editingEvent() ? 'Editar evento' : 'Nuevo evento'"
+  (onClose)="closeModal()"
+>
+  <form (ngSubmit)="save()" class="space-y-4">
+    <div>
+      <label for="evt-name" class="block text-sm font-medium text-gray-700 mb-1"
+        >Nombre <span class="text-red-500">*</span></label
+      >
+      <input
+        id="evt-name"
+        [(ngModel)]="form.name"
+        name="name"
+        required
+        placeholder="Nombre del evento"
+        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent placeholder:text-gray-400"
+      />
+    </div>
+    <div>
+      <label for="evt-desc" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+      <textarea
+        id="evt-desc"
+        [(ngModel)]="form.description"
+        name="description"
+        rows="3"
+        placeholder="Descripción del evento"
+        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent placeholder:text-gray-400 resize-none"
+      ></textarea>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label for="evt-date" class="block text-sm font-medium text-gray-700 mb-1">Fecha <span class="text-red-500">*</span></label>
+        <input
+          id="evt-date"
+          [(ngModel)]="form.date"
+          name="date"
+          type="date"
+          [class.border-red-300]="form.date && isDatePast()"
+          [class.focus:ring-red-500]="form.date && isDatePast()"
+          class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+        />
+        @if (form.date && isDatePast()) {
+          <p class="text-xs text-red-600 mt-1">La fecha no puede ser en el pasado</p>
+        }
+      </div>
+      <div>
+        <label for="evt-time" class="block text-sm font-medium text-gray-700 mb-1">Hora</label>
+        <input
+          id="evt-time"
+          [(ngModel)]="form.time"
+          name="time"
+          type="time"
+          class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+        />
+      </div>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1"
+        >Imagen <span class="text-red-500">*</span></label
+      >
+      @if (imagePreview()) {
+        <div class="bg-gray-50 rounded-xl border border-gray-200 p-4">
+          <div class="flex items-start gap-4">
+            <div class="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 shrink-0 bg-white">
+              <img [src]="imagePreview()" alt="Preview" class="w-full h-full object-cover" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-500">Imagen seleccionada</p>
+              <div class="flex gap-2 mt-3">
+                <input
+                  #editFileInput
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  class="hidden"
+                  (change)="onImageChange($any($event.target).files[0])"
+                />
+                <button
+                  type="button"
+                  class="text-xs text-[var(--color-primary)] font-medium hover:underline"
+                  (click)="editFileInput.click()"
+                >
+                  Reemplazar imagen
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div
+          class="relative border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer transition-colors hover:border-[var(--color-primary)]"
+          (click)="fileInput.click()"
+        >
+          <input
+            #fileInput
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            class="hidden"
+            (change)="onImageChange($any($event.target).files[0])"
+          />
+          <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p class="text-sm text-gray-600 font-medium">Haz clic para seleccionar una imagen</p>
+          <p class="text-xs text-gray-400 mt-1">PNG, JPG, WebP — Máx 5 MB</p>
+        </div>
+      }
+    </div>
+    <div class="flex justify-end gap-3 pt-2">
+      <app-button type="button" variant="secondary" (onClick)="closeModal()">Cancelar</app-button>
+      <app-button type="submit" [loading]="saving()" [disabled]="!isFormValid()">
+        {{ editingEvent() ? 'Guardar cambios' : 'Crear evento' }}
+      </app-button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Delete Confirm -->
+<app-confirm-dialog
+  [open]="deleteDialogOpen()"
+  title="Eliminar evento"
+  message="¿Estás seguro de eliminar este evento? Esta acción no se puede deshacer."
+  confirmText="Eliminar"
+  [loading]="deleting()"
+  (onConfirm)="executeDelete()"
+  (onCancel)="deleteDialogOpen.set(false)"
+/>
