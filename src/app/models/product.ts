@@ -12,6 +12,7 @@ export interface Product {
   prices: {
     id?: string;
     product_id?: string;
+    name?: string;
     price: number;
     start_day: number | null;
     end_day: number | null;

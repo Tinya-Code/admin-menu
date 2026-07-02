@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Combo, ComboForm } from '../models/combo';
+import { Combo } from '../models/combo';
 
 interface DataResponse<T> {
   data: T;
@@ -25,12 +25,12 @@ export class ComboService {
     return this.http.get<DataResponse<Combo>>(`${this.apiUrl}/${id}`);
   }
 
-  create(data: ComboForm): Observable<DataResponse<Combo>> {
-    return this.http.post<DataResponse<Combo>>(this.apiUrl, data);
+  create(formData: FormData): Observable<DataResponse<Combo>> {
+    return this.http.post<DataResponse<Combo>>(this.apiUrl, formData);
   }
 
-  update(id: string, data: ComboForm): Observable<DataResponse<Combo>> {
-    return this.http.put<DataResponse<Combo>>(`${this.apiUrl}/${id}`, data);
+  update(id: string, formData: FormData): Observable<DataResponse<Combo>> {
+    return this.http.put<DataResponse<Combo>>(`${this.apiUrl}/${id}`, formData);
   }
 
   delete(id: string): Observable<MessageResponse> {
