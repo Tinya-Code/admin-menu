@@ -10,23 +10,25 @@ export interface PromotionData {
   endDate: string;
 }
 
-function dateRangeValidator(control: AbstractControl): ValidationErrors | null {
-  const startDate = control.get('startDate')?.value;
-  const endDate = control.get('endDate')?.value;
-  if (!startDate || !endDate) return null;
+function dateRangeValidator(isEditing: boolean) {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const startDate = control.get('startDate')?.value;
+    const endDate = control.get('endDate')?.value;
+    if (!startDate || !endDate) return null;
 
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-  if (start < now) {
-    return { startDateBeforeToday: true };
-  }
-  if (start > end) {
-    return { startDateAfterEndDate: true };
-  }
-  return null;
+    if (!isEditing && start < now) {
+      return { startDateBeforeToday: true };
+    }
+    if (start > end) {
+      return { startDateAfterEndDate: true };
+    }
+    return null;
+  };
 }
 
 @Component({
@@ -55,11 +57,13 @@ export class Promotions {
       price: [0, [Validators.required, Validators.min(0.01)]],
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
-    }, { validators: dateRangeValidator });
+    }, { validators: dateRangeValidator(false) });
   }
 
   openForm(): void {
     this.form.reset({ name: '', price: 0, startDate: '', endDate: '' });
+    this.form.setValidators(dateRangeValidator(false));
+    this.form.updateValueAndValidity();
     this.form.markAsPristine();
     this.form.markAsUntouched();
     this.editingItem.set(null);
@@ -73,6 +77,8 @@ export class Promotions {
       startDate: item.startDate,
       endDate: item.endDate,
     });
+    this.form.setValidators(dateRangeValidator(true));
+    this.form.updateValueAndValidity();
     this.form.markAsPristine();
     this.form.markAsUntouched();
     this.editingItem.set(item);
