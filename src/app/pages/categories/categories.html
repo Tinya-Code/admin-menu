@@ -16,7 +16,7 @@
     <app-search-input
       [searchTerm]="searchTerm()"
       placeholder="Buscar categorías..."
-      (onSearch)="searchTerm.set($event); applyFilter()"
+      (onSearch)="onSearch($event)"
     />
   </div>
 
@@ -52,7 +52,7 @@
         </div>
       }
     </div>
-  } @else if (filteredCategories().length === 0) {
+  } @else if (categories().length === 0) {
     <!-- Empty -->
     <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
       <svg lucideInbox class="w-12 h-12 mx-auto text-gray-300 mb-4"></svg>
@@ -88,7 +88,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
-          @for (cat of filteredCategories(); track cat.id) {
+          @for (cat of categories(); track cat.id) {
             <tr class="hover:bg-gray-50 transition-colors">
               <td class="px-6 py-4">
                 <p class="text-sm font-medium text-gray-900">{{ cat.name }}</p>
@@ -125,7 +125,7 @@
 
     <!-- Mobile cards -->
     <div class="sm:hidden space-y-3">
-      @for (cat of filteredCategories(); track cat.id) {
+      @for (cat of categories(); track cat.id) {
         <div class="bg-white rounded-xl border border-gray-200 p-4">
           <div class="flex items-start justify-between">
             <div>
@@ -150,6 +150,33 @@
         </div>
       }
     </div>
+
+    <!-- Pagination -->
+    @if (meta() && meta()!.total_pages > 1) {
+      <div class="flex items-center justify-between px-6 py-3 mt-4 bg-white rounded-xl border border-gray-200">
+        <p class="text-xs text-gray-500">
+          Página {{ meta()!.current_page }} de {{ meta()!.total_pages }}
+        </p>
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            [disabled]="!meta()!.has_prev"
+            (click)="goToPage(currentPage() - 1)"
+            class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg lucideChevronLeft class="w-4 h-4"></svg>
+          </button>
+          <button
+            type="button"
+            [disabled]="!meta()!.has_next"
+            (click)="goToPage(currentPage() + 1)"
+            class="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg lucideChevronRight class="w-4 h-4"></svg>
+          </button>
+        </div>
+      </div>
+    }
   }
 </div>
 

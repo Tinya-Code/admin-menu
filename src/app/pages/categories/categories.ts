@@ -1,7 +1,9 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NgClass } from '@angular/common';
 import { CategoryService } from '../../services/category.service';
 import { Category, CategoryForm } from '../../models/category';
+import { PaginationMeta } from '../../models/api-response';
 import { Button } from '../../components/shared/button';
 import { Modal } from '../../components/shared/modal';
 import { ConfirmDialog } from '../../components/shared/confirm-dialog';
@@ -12,27 +14,31 @@ import {
   LucideInbox,
   LucidePencil,
   LucideTrash2,
+  LucideChevronLeft,
+  LucideChevronRight,
 } from '@lucide/angular';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [FormsModule, Button, Modal, ConfirmDialog, SearchInput, LucidePlus, LucideAlertTriangle, LucideInbox, LucidePencil, LucideTrash2],
+  imports: [FormsModule, NgClass, Button, Modal, ConfirmDialog, SearchInput, LucidePlus, LucideAlertTriangle, LucideInbox, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {
   private categoryService = inject(CategoryService);
 
   protected categories = signal<Category[]>([]);
-  protected filteredCategories = signal<Category[]>([]);
+  protected meta = signal<PaginationMeta | null>(null);
   protected loading = signal(true);
   protected apiError = signal<string | null>(null);
   protected searchTerm = signal('');
+  protected currentPage = signal(1);
+  protected readonly pageSize = 10;
 
   protected modalOpen = signal(false);
   protected editingCategory = signal<Category | null>(null);
   protected saving = signal(false);
-  protected form: CategoryForm = { name: '', description: '', block_id: '', sort_order: 0 };
+  protected form: CategoryForm = { name: '', description: '', block_id: '' };
 
   protected deleteDialogOpen = signal(false);
   protected deletingId = signal<string | null>(null);
@@ -55,10 +61,10 @@ export class Categories implements OnInit {
   protected loadCategories(): void {
     this.loading.set(true);
     this.apiError.set(null);
-    this.categoryService.getAll().subscribe({
+    this.categoryService.getPaginated(this.currentPage(), this.pageSize, this.searchTerm()).subscribe({
       next: (res) => {
         this.categories.set(res.data);
-        this.applyFilter();
+        this.meta.set(res.meta);
         this.loading.set(false);
       },
       error: () => {
@@ -68,24 +74,21 @@ export class Categories implements OnInit {
     });
   }
 
-  protected applyFilter(): void {
-    const term = this.searchTerm().toLowerCase();
-    if (!term) {
-      this.filteredCategories.set(this.categories());
-      return;
-    }
-    this.filteredCategories.set(
-      this.categories().filter(
-        (c) =>
-          c.name.toLowerCase().includes(term) ||
-          c.description.toLowerCase().includes(term)
-      )
-    );
+  protected onSearch(term: string): void {
+    this.searchTerm.set(term);
+    this.currentPage.set(1);
+    this.loadCategories();
+  }
+
+  protected goToPage(page: number): void {
+    if (page < 1 || !this.meta() || page > this.meta()!.total_pages) return;
+    this.currentPage.set(page);
+    this.loadCategories();
   }
 
   protected openCreate(): void {
     this.editingCategory.set(null);
-    this.form = { name: '', description: '', block_id: '', sort_order: 0 };
+    this.form = { name: '', description: '', block_id: '' };
     this.modalOpen.set(true);
   }
 
@@ -95,7 +98,6 @@ export class Categories implements OnInit {
       name: category.name,
       description: category.description,
       block_id: category.block_id,
-      sort_order: category.sort_order,
     };
     this.modalOpen.set(true);
   }
