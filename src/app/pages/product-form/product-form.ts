@@ -107,7 +107,7 @@ export class ProductForm implements OnInit {
           } else {
             promos.push({
               id: p.id,
-              name: 'Promoción',
+              name: p.name ?? 'Promoción',
               price: p.price,
               startDate: p.start_datetime ?? '',
               endDate: p.end_datetime ?? '',
@@ -168,7 +168,11 @@ export class ProductForm implements OnInit {
       formData.append('category_id', raw.categoryId ?? '');
       formData.append('price', String(raw.basePrice));
       formData.append('is_active', raw.status ? '1' : '0');
-      if (this.selectedImage) formData.append('image', this.selectedImage);
+      if (this.selectedImage) {
+        formData.append('image', this.selectedImage);
+      } else if (this.isEditing() && this.existingImageUrl()) {
+        formData.append('image_url', this.existingImageUrl()!);
+      }
 
       // Build prices array as JSON
       const prices: any[] = [];
@@ -186,6 +190,7 @@ export class ProductForm implements OnInit {
       }
       for (const promo of this.promotions()) {
         const entry: any = {
+          name: promo.name,
           price: promo.price,
           rule_type: 'PROMOTION',
           start_datetime: promo.startDate ? promo.startDate.replace('T', ' ') + (promo.startDate.includes(':00') ? '' : ':00') : null,
