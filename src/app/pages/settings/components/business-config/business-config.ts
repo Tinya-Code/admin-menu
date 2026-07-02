@@ -18,11 +18,12 @@ import {
 } from '../../../../models/settings';
 
 import { Time12Pipe } from '../../../../pipes/time-12.pipe';
+import { LucidePlus } from '@lucide/angular';
 
 @Component({
   selector: 'app-business-config',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Time12Pipe],
+  imports: [CommonModule, ReactiveFormsModule, Time12Pipe, LucidePlus],
   templateUrl: './business-config.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

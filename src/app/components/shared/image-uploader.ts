@@ -10,6 +10,14 @@ const MAX_SIZE = 5 * 1024 * 1024;
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-2">Imagen del producto</label>
 
+      <input
+        #fileInput
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        class="hidden"
+        (change)="onFileSelected($event)"
+      />
+
       @if (previewUrl()) {
         <!-- Preview card -->
         <div class="bg-gray-50 rounded-xl border border-gray-200 p-4">
@@ -70,13 +78,6 @@ const MAX_SIZE = 5 * 1024 * 1024;
           (drop)="onDrop($event)"
           (click)="openFilePicker()"
         >
-          <input
-            #fileInput
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            class="hidden"
-            (change)="onFileSelected($event)"
-          />
           <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
@@ -123,6 +124,9 @@ export class ImageUploader {
   }
 
   protected openFilePicker(): void {
+    if (this.fileInputRef?.nativeElement) {
+      this.fileInputRef.nativeElement.value = '';
+    }
     this.fileInputRef?.nativeElement.click();
   }
 

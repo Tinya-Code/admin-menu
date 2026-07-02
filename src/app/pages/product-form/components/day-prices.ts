@@ -9,6 +9,12 @@ export interface DayGroupData {
   price: number;
 }
 
+export interface PriceGroup {
+  price: number;
+  days: number[];
+  items: DayGroupData[];
+}
+
 @Component({
   selector: 'app-day-prices',
   standalone: true,
@@ -29,16 +35,26 @@ export class DayPrices {
 
   dayGroups = model.required<DayGroupData[]>();
 
-  protected sortedDayGroups = computed(() =>
-    [...this.dayGroups()].sort((a, b) => {
-      const firstDay = (d: number) => (d === 0 ? 7 : d);
-      return firstDay(a.days[0]) - firstDay(b.days[0]);
-    })
-  );
+  protected priceGroups = computed(() => {
+    const groups = this.dayGroups();
+    const map = new Map<number, DayGroupData[]>();
+    for (const group of groups) {
+      const existing = map.get(group.price) || [];
+      existing.push(group);
+      map.set(group.price, existing);
+    }
+    return Array.from(map.entries())
+      .map(([price, items]) => ({
+        price,
+        days: items.flatMap((g) => g.days).sort((a, b) => (a === 0 ? 7 : a) - (b === 0 ? 7 : b)),
+        items,
+      }))
+      .sort((a, b) => a.days[0] - b.days[0]);
+  });
 
   protected showForm = signal(false);
-  protected editingItem = signal<DayGroupData | null>(null);
-  protected confirmDeleteIndex = signal<number | null>(null);
+  protected editingItem = signal<PriceGroup | null>(null);
+  protected confirmDeletePrice = signal<number | null>(null);
   protected overlapWarning = signal<string | null>(null);
 
   protected form: { days: boolean[]; price: FormControl<number> };
@@ -70,9 +86,9 @@ export class DayPrices {
     this.showForm.set(true);
   }
 
-  onEdit(item: DayGroupData): void {
+  onEdit(group: PriceGroup): void {
     const days = Array(7).fill(false);
-    for (const dayNum of item.days) {
+    for (const dayNum of group.days) {
       const displayIndex = this.dayNumberMap.indexOf(dayNum);
       if (displayIndex !== -1) {
         days[displayIndex] = true;
@@ -80,12 +96,12 @@ export class DayPrices {
     }
     this.form = {
       days,
-      price: new FormControl(item.price, {
+      price: new FormControl(group.price, {
         nonNullable: true,
         validators: [Validators.required, Validators.min(0.01)],
       }),
     };
-    this.editingItem.set(item);
+    this.editingItem.set(group);
     this.overlapWarning.set(null);
     this.showForm.set(true);
   }
@@ -99,9 +115,12 @@ export class DayPrices {
   isDayTaken(displayIndex: number): boolean {
     const dayNumber = this.dayNumberMap[displayIndex];
     const editing = this.editingItem();
-    return this.dayGroups().some((g) =>
-      editing !== null && g === editing ? false : g.days.includes(dayNumber),
-    );
+    if (editing) {
+      return this.dayGroups().some((g) =>
+        g.price !== editing.price && g.days.includes(dayNumber),
+      );
+    }
+    return this.dayGroups().some((g) => g.days.includes(dayNumber));
   }
 
   toggleCheckbox(index: number): void {
@@ -119,27 +138,24 @@ export class DayPrices {
       return;
     }
     const editing = this.editingItem();
-    const editingIdx = editing !== null ? this.dayGroups().indexOf(editing) : -1;
     for (const [i, g] of this.dayGroups().entries()) {
-      if (editingIdx !== -1 && i === editingIdx) continue;
+      if (editing && g.price === editing.price) continue;
       if (selected.some((d) => g.days.includes(d))) {
         this.overlapWarning.set('Los días seleccionados se superponen con otro grupo existente.');
         return;
       }
     }
-    const group: DayGroupData = {
+    const newGroup: DayGroupData = {
       days: selected,
       price: this.form.price.value,
     };
     this.dayGroups.update((current) => {
-      const updated = [...current];
-      if (editingIdx !== -1) {
-        const existing = current[editingIdx];
-        if (existing.id) group.id = existing.id;
-        updated[editingIdx] = group;
-      } else {
-        updated.push(group);
+      let updated = [...current];
+      if (editing) {
+        updated = updated.filter((g) => g.price !== editing.price);
+        if (editing.items[0]?.id) newGroup.id = editing.items[0].id;
       }
+      updated.push(newGroup);
       return updated;
     });
     this.editingItem.set(null);
@@ -147,25 +163,24 @@ export class DayPrices {
     this.showForm.set(false);
   }
 
-  onRequestDelete(item: DayGroupData): void {
-    const idx = this.dayGroups().indexOf(item);
-    if (idx !== -1) this.confirmDeleteIndex.set(idx);
+  onRequestDelete(price: number): void {
+    this.confirmDeletePrice.set(price);
   }
 
   onConfirmDelete(): void {
-    const idx = this.confirmDeleteIndex();
-    if (idx === null) return;
-    this.dayGroups.update((current) => current.filter((_, i) => i !== idx));
-    this.confirmDeleteIndex.set(null);
+    const price = this.confirmDeletePrice();
+    if (price === null) return;
+    this.dayGroups.update((current) => current.filter((g) => g.price !== price));
+    this.confirmDeletePrice.set(null);
   }
 
   onCancelDelete(): void {
-    this.confirmDeleteIndex.set(null);
+    this.confirmDeletePrice.set(null);
   }
 
   formatDays(days: number[]): string {
     const names = days
-      .sort((a, b) => a - b || (a === 0 ? -1 : 1))
+      .sort((a, b) => (a === 0 ? 7 : a) - (b === 0 ? 7 : b))
       .map((d) => this.dayNames[this.dayNumberMap.indexOf(d)])
       .map((name) => name.substring(0, 3));
     return names.join(', ');
