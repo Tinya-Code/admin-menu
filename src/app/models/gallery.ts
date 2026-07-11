@@ -1,16 +1,13 @@
-export interface Event {
+export interface Gallery {
   id: string;
   name: string;
   description: string;
-  date: string;
   image_url: string;
   created_at: string;
   updated_at: string;
 }
 
-export interface EventForm {
+export interface GalleryForm {
   name: string;
   description: string;
-  date: string;
-  time: string;
 }

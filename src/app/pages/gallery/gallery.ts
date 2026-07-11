@@ -1,32 +1,45 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { EventService } from '../../services/event.service';
-import { Event, EventForm } from '../../models/event';
-import { PaginationMeta } from '../../models/api-response';
-import { Button } from '../../components/shared/button';
-import { Modal } from '../../components/shared/modal';
-import { ConfirmDialog } from '../../components/shared/confirm-dialog';
-import { SearchInput } from '../../components/shared/search-input';
 import {
-  LucidePlus,
   LucideAlertTriangle,
-  LucideInbox,
-  LucidePencil,
-  LucideTrash2,
   LucideChevronLeft,
   LucideChevronRight,
+  LucideInbox,
+  LucidePencil,
+  LucidePlus,
+  LucideTrash2,
 } from '@lucide/angular';
+import { Button } from '../../components/shared/button';
+import { ConfirmDialog } from '../../components/shared/confirm-dialog';
+import { Modal } from '../../components/shared/modal';
+import { SearchInput } from '../../components/shared/search-input';
+import { PaginationMeta } from '../../models/api-response';
+import { GalleryForm, Gallery as GalleryModel } from '../../models/gallery';
+import { GalleryService } from '../../services/gallery.service';
 
 @Component({
-  selector: 'app-events',
+  selector: 'app-gallery',
   standalone: true,
-  imports: [FormsModule, Button, Modal, ConfirmDialog, SearchInput, LucidePlus, LucideAlertTriangle, LucideInbox, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight],
-  templateUrl: './events.html',
+  imports: [
+    FormsModule,
+    Button,
+    Modal,
+    ConfirmDialog,
+    SearchInput,
+    LucidePlus,
+    LucideAlertTriangle,
+    LucideInbox,
+    LucidePencil,
+    LucideTrash2,
+    LucideChevronLeft,
+    LucideChevronRight,
+  ],
+  templateUrl: './gallery.html',
 })
-export class Events implements OnInit {
-  private eventService = inject(EventService);
+export class Gallery implements OnInit {
+  private galleryService = inject(GalleryService);
 
-  protected events = signal<Event[]>([]);
+  protected events = signal<GalleryModel[]>([]);
   protected loading = signal(true);
   protected apiError = signal<string | null>(null);
   protected searchTerm = signal('');
@@ -36,9 +49,9 @@ export class Events implements OnInit {
   protected meta = signal<PaginationMeta | null>(null);
 
   protected modalOpen = signal(false);
-  protected editingEvent = signal<Event | null>(null);
+  protected editingEvent = signal<GalleryModel | null>(null);
   protected saving = signal(false);
-  protected form: EventForm = { name: '', description: '', date: '', time: '' };
+  protected form: GalleryForm = { name: '', description: '' };
 
   protected deleteDialogOpen = signal(false);
   protected deletingId = signal<string | null>(null);
@@ -49,17 +62,8 @@ export class Events implements OnInit {
 
   protected isFormValid(): boolean {
     const hasName = this.form.name.trim().length > 0;
-    const hasDate = this.form.date.trim().length > 0;
     const hasImage = !!this.selectedImage || !!this.editingEvent()?.image_url;
-    if (!hasName || !hasDate || !hasImage) return false;
-    return !this.isDatePast();
-  }
-
-  protected isDatePast(): boolean {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const selected = new Date(this.form.date + 'T00:00:00');
-    return selected < today;
+    return hasName && hasImage;
   }
 
   ngOnInit(): void {
@@ -69,7 +73,7 @@ export class Events implements OnInit {
   protected loadEvents(): void {
     this.loading.set(true);
     this.apiError.set(null);
-    this.eventService.getAll(this.currentPage(), this.pageSize()).subscribe({
+    this.galleryService.getAll(this.currentPage(), this.pageSize()).subscribe({
       next: (res) => {
         this.events.set(res.data ?? []);
         this.meta.set(res.meta ?? null);
@@ -77,7 +81,9 @@ export class Events implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.apiError.set('No se pudo conectar con el servidor. Verifica que la API esté corriendo.');
+        this.apiError.set(
+          'No se pudo conectar con el servidor. Verifica que la API esté corriendo.',
+        );
       },
     });
   }
@@ -113,23 +119,20 @@ export class Events implements OnInit {
 
   protected openCreate(): void {
     this.editingEvent.set(null);
-    this.form = { name: '', description: '', date: '', time: '' };
+    this.form = { name: '', description: '' };
     this.selectedImage = null;
     this.imagePreview.set(null);
     this.modalOpen.set(true);
   }
 
-  protected openEdit(event: Event): void {
-    this.editingEvent.set(event);
-    const dateStr = event.date || '';
+  protected openEdit(photo: GalleryModel): void {
+    this.editingEvent.set(photo);
     this.form = {
-      name: event.name,
-      description: event.description || '',
-      date: dateStr ? dateStr.substring(0, 10) : '',
-      time: dateStr && dateStr.length > 10 ? dateStr.substring(11, 16) : '',
+      name: photo.name,
+      description: photo.description || '',
     };
     this.selectedImage = null;
-    this.imagePreview.set(event.image_url || null);
+    this.imagePreview.set(photo.image_url || null);
     this.modalOpen.set(true);
   }
 
@@ -155,10 +158,6 @@ export class Events implements OnInit {
     const formData = new FormData();
     formData.append('name', this.form.name);
     formData.append('description', this.form.description || '');
-    const dateVal = this.form.date && this.form.time
-      ? `${this.form.date} ${this.form.time}`
-      : this.form.date || '';
-    formData.append('date', dateVal);
     if (this.selectedImage) {
       formData.append('image', this.selectedImage);
     } else if (this.editingEvent()?.image_url) {
@@ -166,8 +165,8 @@ export class Events implements OnInit {
     }
 
     const request = this.editingEvent()
-      ? this.eventService.update(this.editingEvent()!.id, formData)
-      : this.eventService.create(formData);
+      ? this.galleryService.update(this.editingEvent()!.id, formData)
+      : this.galleryService.create(formData);
 
     request.subscribe({
       next: () => {
@@ -177,12 +176,12 @@ export class Events implements OnInit {
       },
       error: () => {
         this.saving.set(false);
-        this.apiError.set('Error al guardar el evento. Intenta de nuevo.');
+        this.apiError.set('Error al guardar la imagen. Intenta de nuevo.');
       },
     });
   }
 
-  protected confirmDelete(event: Event): void {
+  protected confirmDelete(event: GalleryModel): void {
     this.deletingId.set(event.id);
     this.deleteDialogOpen.set(true);
   }
@@ -192,7 +191,7 @@ export class Events implements OnInit {
     if (!id) return;
 
     this.deleting.set(true);
-    this.eventService.delete(id).subscribe({
+    this.galleryService.delete(id).subscribe({
       next: () => {
         this.deleting.set(false);
         this.deleteDialogOpen.set(false);
@@ -201,19 +200,8 @@ export class Events implements OnInit {
       },
       error: () => {
         this.deleting.set(false);
-        this.apiError.set('Error al eliminar el evento. Intenta de nuevo.');
+        this.apiError.set('Error al eliminar la imagen. Intenta de nuevo.');
       },
     });
-  }
-
-  protected formatDateTime(dateStr: string): string {
-    if (!dateStr) return '—';
-    const d = new Date(dateStr.replace(' ', 'T'));
-    const date = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-    if (dateStr.length > 10) {
-      const time = dateStr.substring(11, 16);
-      return `${date} ${time}`;
-    }
-    return date;
   }
 }

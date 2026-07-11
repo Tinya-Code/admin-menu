@@ -2,12 +2,12 @@
   <!-- Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Eventos</h1>
-      <p class="text-sm text-gray-500 mt-1">Administra los eventos</p>
+      <h1 class="text-2xl font-bold text-gray-900">Galería</h1>
+      <p class="text-sm text-gray-500 mt-1">Administra las imágenes de la galería</p>
     </div>
     <app-button (onClick)="openCreate()">
       <svg lucidePlus class="w-4 h-4"></svg>
-      Nuevo evento
+      Nueva imagen
     </app-button>
   </div>
 
@@ -15,7 +15,7 @@
   <div class="mb-6 w-full md:max-w-xs">
     <app-search-input
       [searchTerm]="searchTerm()"
-      placeholder="Buscar eventos..."
+      placeholder="Buscar imágenes..."
       (onSearch)="onSearch($event)"
     />
   </div>
@@ -57,8 +57,8 @@
     <!-- Empty -->
     <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
       <svg lucideInbox class="w-12 h-12 mx-auto text-gray-300 mb-4"></svg>
-      <p class="text-gray-500 font-medium">No hay eventos</p>
-      <p class="text-sm text-gray-400 mt-1">Crea tu primer evento para empezar</p>
+      <p class="text-gray-500 font-medium">No hay imágenes</p>
+      <p class="text-sm text-gray-400 mt-1">Sube tu primera imagen para empezar</p>
     </div>
   } @else {
     <!-- Desktop table -->
@@ -66,19 +66,24 @@
       <table class="w-full">
         <thead>
           <tr class="bg-gray-50 border-b border-gray-200">
-            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <th
+              class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+            >
               Imagen
             </th>
-            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <th
+              class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+            >
               Nombre
             </th>
-            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <th
+              class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+            >
               Descripción
             </th>
-            <th class="text-center px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Fecha y hora
-            </th>
-            <th class="text-center px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <th
+              class="text-center px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+            >
               Acciones
             </th>
           </tr>
@@ -89,12 +94,26 @@
               <td class="px-6 py-4">
                 @if (evt.image_url) {
                   <div class="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 bg-white">
-                    <img [src]="evt.image_url" [alt]="evt.name" class="w-full h-full object-cover" />
+                    <img
+                      [src]="evt.image_url"
+                      [alt]="evt.name"
+                      class="w-full h-full object-cover"
+                    />
                   </div>
                 } @else {
                   <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <svg
+                      class="w-6 h-6 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
                     </svg>
                   </div>
                 }
@@ -104,9 +123,6 @@
               </td>
               <td class="px-6 py-4">
                 <p class="text-sm text-gray-500 truncate max-w-xs">{{ evt.description }}</p>
-              </td>
-              <td class="px-6 py-4 text-center">
-                <span class="text-sm text-gray-600">{{ formatDateTime(evt.date) }}</span>
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
@@ -138,7 +154,9 @@
         <div class="bg-white rounded-xl border border-gray-200 p-4">
           <div class="flex items-start gap-3">
             @if (evt.image_url) {
-              <div class="w-14 h-14 rounded-lg overflow-hidden border border-gray-200 shrink-0 bg-white">
+              <div
+                class="w-14 h-14 rounded-lg overflow-hidden border border-gray-200 shrink-0 bg-white"
+              >
                 <img [src]="evt.image_url" [alt]="evt.name" class="w-full h-full object-cover" />
               </div>
             }
@@ -147,7 +165,6 @@
               @if (evt.description) {
                 <p class="text-xs text-gray-500 mt-1 truncate">{{ evt.description }}</p>
               }
-              <p class="text-xs text-gray-400 mt-1">{{ formatDateTime(evt.date) }}</p>
             </div>
             <div class="flex gap-1 shrink-0">
               <button
@@ -172,8 +189,8 @@
     @if (meta(); as m) {
       <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
         <p class="text-sm text-gray-500">
-          Mostrando {{ m.total_items === 0 ? 0 : ((m.current_page - 1) * m.limit + 1) }}
-          — {{ m.current_page * m.limit > m.total_items ? m.total_items : m.current_page * m.limit }}
+          Mostrando {{ m.total_items === 0 ? 0 : (m.current_page - 1) * m.limit + 1 }} —
+          {{ m.current_page * m.limit > m.total_items ? m.total_items : m.current_page * m.limit }}
           de {{ m.total_items }} resultados
         </p>
         <div class="flex items-center gap-1">
@@ -212,7 +229,7 @@
 <!-- Create/Edit Modal -->
 <app-modal
   [open]="modalOpen()"
-  [title]="editingEvent() ? 'Editar evento' : 'Nuevo evento'"
+  [title]="editingEvent() ? 'Editar imagen' : 'Nueva imagen'"
   (onClose)="closeModal()"
 >
   <form (ngSubmit)="save()" class="space-y-4">
@@ -225,7 +242,7 @@
         [(ngModel)]="form.name"
         name="name"
         required
-        placeholder="Nombre del evento"
+        placeholder="Nombre de la imagen"
         class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent placeholder:text-gray-400"
       />
     </div>
@@ -236,36 +253,9 @@
         [(ngModel)]="form.description"
         name="description"
         rows="3"
-        placeholder="Descripción del evento"
+        placeholder="Descripción de la imagen"
         class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent placeholder:text-gray-400 resize-none"
       ></textarea>
-    </div>
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label for="evt-date" class="block text-sm font-medium text-gray-700 mb-1">Fecha <span class="text-red-500">*</span></label>
-        <input
-          id="evt-date"
-          [(ngModel)]="form.date"
-          name="date"
-          type="date"
-          [class.border-red-300]="form.date && isDatePast()"
-          [class.focus:ring-red-500]="form.date && isDatePast()"
-          class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
-        />
-        @if (form.date && isDatePast()) {
-          <p class="text-xs text-red-600 mt-1">La fecha no puede ser en el pasado</p>
-        }
-      </div>
-      <div>
-        <label for="evt-time" class="block text-sm font-medium text-gray-700 mb-1">Hora</label>
-        <input
-          id="evt-time"
-          [(ngModel)]="form.time"
-          name="time"
-          type="time"
-          class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
-        />
-      </div>
     </div>
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1"
@@ -274,7 +264,9 @@
       @if (imagePreview()) {
         <div class="bg-gray-50 rounded-xl border border-gray-200 p-4">
           <div class="flex items-start gap-4">
-            <div class="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 shrink-0 bg-white">
+            <div
+              class="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 shrink-0 bg-white"
+            >
               <img [src]="imagePreview()" alt="Preview" class="w-full h-full object-cover" />
             </div>
             <div class="flex-1 min-w-0">
@@ -310,8 +302,18 @@
             class="hidden"
             (change)="onImageChange($any($event.target).files[0])"
           />
-          <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <svg
+            class="w-8 h-8 mx-auto mb-2 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
           </svg>
           <p class="text-sm text-gray-600 font-medium">Haz clic para seleccionar una imagen</p>
           <p class="text-xs text-gray-400 mt-1">PNG, JPG, WebP — Máx 5 MB</p>
@@ -321,7 +323,7 @@
     <div class="flex justify-end gap-3 pt-2">
       <app-button type="button" variant="secondary" (onClick)="closeModal()">Cancelar</app-button>
       <app-button type="submit" [loading]="saving()" [disabled]="!isFormValid()">
-        {{ editingEvent() ? 'Guardar cambios' : 'Crear evento' }}
+        {{ editingEvent() ? 'Guardar cambios' : 'Subir imagen' }}
       </app-button>
     </div>
   </form>
@@ -330,8 +332,8 @@
 <!-- Delete Confirm -->
 <app-confirm-dialog
   [open]="deleteDialogOpen()"
-  title="Eliminar evento"
-  message="¿Estás seguro de eliminar este evento? Esta acción no se puede deshacer."
+  title="Eliminar imagen"
+  message="¿Estás seguro de eliminar esta imagen? Esta acción no se puede deshacer."
   confirmText="Eliminar"
   [loading]="deleting()"
   (onConfirm)="executeDelete()"
