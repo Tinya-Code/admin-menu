@@ -19,15 +19,26 @@ export interface PriceRangeData {
   templateUrl: './variant-price.html',
 })
 export class VariantPrice {
-  protected readonly units = ['unidad', 'kg', 'lt', 'ml', 'caja', 'botella'];
+  protected readonly units = [
+    'unidad',
+    'kg',
+    'lt',
+    'botella',
+    '1 jarra',
+    '1/2 jarra',
+    '1/2 litro',
+    '1 litro',
+    '2 litros',
+    '3 litros',
+  ];
 
   private readonly pluralMap: Record<string, string> = {
     unidad: 'unidades',
     kg: 'kgs',
     lt: 'lts',
-    ml: 'mls',
-    caja: 'cajas',
     botella: 'botellas',
+    '1 jarra': '1 jarra',
+    '1/2 jarra': '1/2 jarra',
   };
 
   priceRanges = model.required<PriceRangeData[]>();
