@@ -37,8 +37,8 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/combos/combos').then((m) => m.Combos),
       },
       {
-        path: 'events',
-        loadComponent: () => import('./pages/events/events').then((m) => m.Events),
+        path: 'gallery',
+        loadComponent: () => import('./pages/gallery/gallery').then((m) => m.Gallery),
       },
       {
         path: 'settings',

@@ -36,7 +36,7 @@ export class AppLayout {
     { label: 'Categorías', path: '/categories', icon: LucideFolderTree },
     { label: 'Productos', path: '/products', icon: LucidePackage },
     { label: 'Combos', path: '/combos', icon: LucideBoxes },
-    { label: 'Eventos', path: '/events', icon: LucideCalendarDays },
+    { label: 'Galería', path: '/gallery', icon: LucideCalendarDays },
     { label: 'Configuración', path: '/settings', icon: LucideSettings },
   ];
 
