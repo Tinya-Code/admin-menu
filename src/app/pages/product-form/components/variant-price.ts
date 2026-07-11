@@ -24,7 +24,7 @@ export class VariantPrice {
     'kg',
     'lt',
     'botella',
-    '1 jarra',
+    'jarra',
     '1/2 jarra',
     '1/2 litro',
     '1 litro',
@@ -37,7 +37,7 @@ export class VariantPrice {
     kg: 'kgs',
     lt: 'lts',
     botella: 'botellas',
-    '1 jarra': '1 jarra',
+    jarra: 'jarras',
     '1/2 jarra': '1/2 jarra',
   };
 
