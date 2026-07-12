@@ -1,15 +1,9 @@
-export interface Promotion {
+import { ProductPrice } from './product-price';
+
+export interface Promotion extends ProductPrice {
   id: string;
-  product_id: string;
-  price: string;
-  name: string;
-  description: string | null;
-  start_day: number | null;
-  end_day: number | null;
-  start_datetime: string | null;
-  end_datetime: string | null;
-  rule_type: 'DAY' | 'PROMOTION';
-  product_name: string;
-  product_price: string;
-  product_image: string | null;
+  productId: string;
+  productName: string;
+  productPrice: string;
+  productImage: string | null;
 }
