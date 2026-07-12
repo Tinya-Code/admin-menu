@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { initializeApp } from 'firebase/app';
 import {
@@ -12,13 +13,28 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from 'firebase/auth';
-import { BehaviorSubject, Observable, from } from 'rxjs';
+import { BehaviorSubject, Observable, from, switchMap, tap, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { UserProfile } from '../models/user-profile';
+
+interface LoginResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: {
+      id: string;
+      email: string;
+      name: string;
+      role: string;
+      restaurantId: string;
+    };
+  };
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private router = inject(Router);
+  private http = inject(HttpClient);
   private auth: Auth;
   private userSubject = new BehaviorSubject<UserProfile | null>(null);
   private readySubject = new BehaviorSubject<boolean>(false);
@@ -32,11 +48,16 @@ export class AuthService {
 
     onAuthStateChanged(this.auth, (firebaseUser: User | null) => {
       if (firebaseUser) {
-        this.userSubject.next(this.mapUser(firebaseUser));
+        this.loginWithBackend().subscribe({
+          error: () => {
+            this.userSubject.next(null);
+            this.readySubject.next(true);
+          },
+        });
       } else {
         this.userSubject.next(null);
+        this.readySubject.next(true);
       }
-      this.readySubject.next(true);
     });
   }
 
@@ -46,6 +67,10 @@ export class AuthService {
 
   get isAuthenticated(): boolean {
     return this.userSubject.value !== null;
+  }
+
+  get restaurantId(): string | null {
+    return this.userSubject.value?.restaurant_id ?? null;
   }
 
   signInWithEmail(email: string, password: string): Observable<UserCredential> {
@@ -66,12 +91,25 @@ export class AuthService {
     return this.auth.currentUser.getIdToken();
   }
 
-  private mapUser(user: User): UserProfile {
-    return {
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL,
-    };
+  loginWithBackend(): Observable<UserProfile> {
+    return from(this.getIdToken()).pipe(
+      switchMap((idToken) =>
+        this.http.post<LoginResponse>(`${environment.apiURL}/auth/login`, { idToken })
+      ),
+      map((res) => {
+        const user = res.data.user;
+        return {
+          uid: user.id,
+          email: user.email,
+          restaurant_id: user.restaurantId,
+          displayName: user.name,
+          photoURL: null,
+        };
+      }),
+      tap((profile) => {
+        this.userSubject.next(profile);
+        this.readySubject.next(true);
+      })
+    );
   }
 }

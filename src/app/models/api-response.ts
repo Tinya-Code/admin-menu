@@ -1,12 +1,32 @@
 export interface PaginationMeta {
-  limit: number; // cantidad por página
-  current_page: number; // página actual
-  total_pages: number; // total de páginas
-  total_items: number; // total de registros
-  has_next: boolean; // hay página siguiente
-  has_prev: boolean; // hay página anterior
-  order_by?: string; // campo de ordenamiento
-  sortDirection?: 'ASC' | 'DESC'; // dirección de orden
+  limit: number;
+  current_page: number;
+  total_pages: number;
+  total_items: number;
+  has_next: boolean;
+  has_prev: boolean;
+  order_by?: string;
+  sortDirection?: 'ASC' | 'DESC';
+}
+
+export interface BackendPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
+
+export function normalizePagination(p: BackendPagination): PaginationMeta {
+  return {
+    current_page: p.page,
+    total_pages: p.totalPages,
+    total_items: p.total,
+    has_next: p.hasNext,
+    has_prev: p.hasPrevious,
+    limit: p.limit,
+  };
 }
 
 export interface ApiError {

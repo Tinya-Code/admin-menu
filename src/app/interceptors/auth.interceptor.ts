@@ -1,8 +1,8 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { from, switchMap } from 'rxjs';
-import { AuthService } from '../services/auth.service';
 import { environment } from '../../environments/environment';
+import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
@@ -12,13 +12,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return from(authService.getIdToken()).pipe(
     switchMap((token) => {
+      let cloned = req;
       if (token) {
-        const cloned = req.clone({
-          headers: req.headers.set('Authorization', `Bearer ${token}`),
-        });
-        return next(cloned);
+        cloned = cloned.clone({ headers: cloned.headers.set('Authorization', `Bearer ${token}`) });
       }
-      return next(req);
-    })
+      const restaurantId = authService.restaurantId;
+      if (restaurantId) {
+        cloned = cloned.clone({ headers: cloned.headers.set('X-Restaurant-Id', restaurantId) });
+      }
+      return next(cloned);
+    }),
   );
 };
