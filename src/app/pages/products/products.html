@@ -102,8 +102,8 @@
             <tr class="hover:bg-gray-50 transition-colors">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
-                  @if (prod.image_url) {
-                    <img [src]="prod.image_url" alt="" class="w-10 h-10 rounded-lg object-cover" />
+              @if (prod.imageUrl) {
+                  <img [src]="prod.imageUrl" alt="" class="w-10 h-10 rounded-lg object-cover" />
                   } @else {
                     <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
                       <svg
@@ -121,15 +121,15 @@
                 </div>
               </td>
               <td class="px-6 py-4">
-                <span class="text-sm text-gray-600">{{ getCategoryName(prod.category_id) }}</span>
+                <span class="text-sm text-gray-600">{{ getCategoryName(prod.categoryId) }}</span>
               </td>
               <td class="px-6 py-4 text-right">
                 <span class="text-sm font-semibold text-gray-900"
-                  >S/{{ prod.price?.toFixed(2) ?? '—' }}</span
+                  >S/{{ prod.price != null ? (+prod.price).toFixed(2) : '—' }}</span
                 >
               </td>
               <td class="px-6 py-4">
-                @if (prod.is_active) {
+                @if (prod.isActive) {
                   <span
                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200"
                     >Activo</span
@@ -170,9 +170,9 @@
       @for (prod of products(); track prod.id) {
         <div class="bg-white rounded-xl border border-gray-200 p-4">
           <div class="flex items-start gap-3">
-            @if (prod.image_url) {
+            @if (prod.imageUrl) {
               <img
-                [src]="prod.image_url"
+                [src]="prod.imageUrl"
                 alt=""
                 class="w-12 h-12 rounded-lg object-cover shrink-0"
               />
@@ -190,7 +190,7 @@
               <div class="flex items-start justify-between">
                 <div>
                   <p class="text-sm font-medium text-gray-900">{{ prod.name }}</p>
-                  <p class="text-xs text-gray-500">{{ getCategoryName(prod.category_id) }}</p>
+                  <p class="text-xs text-gray-500">{{ getCategoryName(prod.categoryId) }}</p>
                 </div>
                 <div class="flex gap-1">
                   <button
@@ -209,9 +209,9 @@
               </div>
               <div class="flex items-center justify-between mt-2">
                 <span class="text-sm font-semibold text-gray-900"
-                  >S/{{ prod.price?.toFixed(2) ?? '—' }}</span
+                  >S/{{ prod.price != null ? (+prod.price).toFixed(2) : '—' }}</span
                 >
-                @if (prod.is_active) {
+                @if (prod.isActive) {
                   <span
                     class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700"
                     >Activo</span
