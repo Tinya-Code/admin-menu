@@ -41,13 +41,13 @@ export class PromotionsTable implements OnInit {
     if (term) {
       rows = rows.filter(
         (r) =>
-          r.product_name.toLowerCase().includes(term) ||
-          r.name.toLowerCase().includes(term),
+          r.productName.toLowerCase().includes(term) ||
+          (r.name ?? '').toLowerCase().includes(term),
       );
     }
     rows.sort((a, b) => {
-      const dateA = a.start_datetime ? new Date(a.start_datetime).getTime() : Infinity;
-      const dateB = b.start_datetime ? new Date(b.start_datetime).getTime() : Infinity;
+      const dateA = a.startDatetime ? new Date(a.startDatetime).getTime() : Infinity;
+      const dateB = b.startDatetime ? new Date(b.startDatetime).getTime() : Infinity;
       return dateA - dateB;
     });
     return rows;
@@ -68,7 +68,8 @@ export class PromotionsTable implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.apiError.set('No se pudieron cargar las promociones.');
+        this.promotions.set([]);
+        this.meta.set(null);
       },
     });
   }
@@ -88,10 +89,10 @@ export class PromotionsTable implements OnInit {
   }
 
   protected isPromoActive(promo: Promotion, _now?: Date | null): boolean {
-    if (!promo.start_datetime || !promo.end_datetime) return false;
+    if (!promo.startDatetime || !promo.endDatetime) return false;
     const now = new Date();
-    const start = new Date(promo.start_datetime);
-    const end = new Date(promo.end_datetime);
+    const start = new Date(promo.startDatetime);
+    const end = new Date(promo.endDatetime);
     return now >= start && now <= end;
   }
 
