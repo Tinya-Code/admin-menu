@@ -1,11 +1,11 @@
 export interface Combo {
-  id: string;
+  id: number;
+  restaurant_id: string;
   name: string;
   description: string;
   price: number;
   image_url: string | null;
-  created_at: string;
-  updated_at: string;
+  is_active: number;
 }
 
 export interface ComboForm {
