@@ -101,41 +101,98 @@
             <span class="text-sm text-gray-700">Producto activo</span>
           </div>
 
-          <!-- Precio Base -->
+          <!-- Tipo de Precio -->
           <div class="w-full">
-            <label class="block text-sm font-semibold text-gray-900 mb-1"
-              >Precio Base <span class="text-red-500">*</span></label
-            >
-            <p class="text-xs text-gray-400 mb-3">
-              Este será el precio utilizado cuando no existan reglas especiales activas.
-            </p>
-            <div class="relative">
-              <span
-                class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm"
-                >S/</span
+            <label class="block text-sm font-semibold text-gray-900 mb-3">Tipo de Precio</label>
+            <div class="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                class="flex items-center gap-3 p-4 border-2 rounded-xl transition-all"
+                [class.border-primary]="productForm.get('priceType')?.value === 'fixed'"
+                [class.bg-primary/5]="productForm.get('priceType')?.value === 'fixed'"
+                [class.border-gray-200]="productForm.get('priceType')?.value !== 'fixed'"
+                [class.hover:border-gray-300]="productForm.get('priceType')?.value !== 'fixed'"
+                (click)="productForm.get('priceType')?.setValue('fixed')"
               >
-              <input
-                type="number"
-                min="0"
-                formControlName="basePrice"
-                placeholder="0.00"
-                class="w-full pl-8 pr-4 py-3 border rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder:text-gray-300"
-                [class.border-red-300]="
-                  productForm.get('basePrice')?.invalid && productForm.get('basePrice')?.touched
-                "
-                [class.border-gray-300]="
-                  !productForm.get('basePrice')?.invalid || !productForm.get('basePrice')?.touched
-                "
-              />
+                <div
+                  class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+                  [class.border-primary]="productForm.get('priceType')?.value === 'fixed'"
+                  [class.border-gray-300]="productForm.get('priceType')?.value !== 'fixed'"
+                >
+                  @if (productForm.get('priceType')?.value === 'fixed') {
+                    <div class="w-2.5 h-2.5 rounded-full bg-primary"></div>
+                  }
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-900">Precio Fijo</p>
+                  <p class="text-xs text-gray-500">Un solo precio base</p>
+                </div>
+              </button>
+              <button
+                type="button"
+                class="flex items-center gap-3 p-4 border-2 rounded-xl transition-all"
+                [class.border-primary]="productForm.get('priceType')?.value === 'variable'"
+                [class.bg-primary/5]="productForm.get('priceType')?.value === 'variable'"
+                [class.border-gray-200]="productForm.get('priceType')?.value !== 'variable'"
+                [class.hover:border-gray-300]="productForm.get('priceType')?.value !== 'variable'"
+                (click)="productForm.get('priceType')?.setValue('variable')"
+              >
+                <div
+                  class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+                  [class.border-primary]="productForm.get('priceType')?.value === 'variable'"
+                  [class.border-gray-300]="productForm.get('priceType')?.value !== 'variable'"
+                >
+                  @if (productForm.get('priceType')?.value === 'variable') {
+                    <div class="w-2.5 h-2.5 rounded-full bg-primary"></div>
+                  }
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-900">Precio Variable</p>
+                  <p class="text-xs text-gray-500">Precios por cantidad/unidad</p>
+                </div>
+              </button>
             </div>
-            @if (productForm.get('basePrice')?.invalid && productForm.get('basePrice')?.touched) {
-              <p class="text-xs text-red-600 mt-2">Debe ser un valor mayor a 0</p>
-            }
           </div>
+
+          <!-- Precio Base (solo si precio fijo) -->
+          @if (productForm.get('priceType')?.value === 'fixed') {
+            <div class="w-full">
+              <label class="block text-sm font-semibold text-gray-900 mb-1"
+                >Precio Base <span class="text-red-500">*</span></label
+              >
+              <p class="text-xs text-gray-400 mb-3">
+                Este será el precio del producto.
+              </p>
+              <div class="relative">
+                <span
+                  class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm"
+                  >S/</span
+                >
+                <input
+                  type="number"
+                  min="0"
+                  formControlName="basePrice"
+                  placeholder="0.00"
+                  class="w-full pl-8 pr-4 py-3 border rounded-lg text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder:text-gray-300"
+                  [class.border-red-300]="
+                    productForm.get('basePrice')?.invalid && productForm.get('basePrice')?.touched
+                  "
+                  [class.border-gray-300]="
+                    !productForm.get('basePrice')?.invalid || !productForm.get('basePrice')?.touched
+                  "
+                />
+              </div>
+              @if (productForm.get('basePrice')?.invalid && productForm.get('basePrice')?.touched) {
+                <p class="text-xs text-red-600 mt-2">Debe ser un valor mayor a 0</p>
+              }
+            </div>
+          }
 
           <div class="flex flex-col gap-6">
             <!-- ============ PRESENTACIONES / PRECIOS POR CANTIDAD ============ -->
-            <app-variant-price [(priceRanges)]="priceRanges" />
+            @if (productForm.get('priceType')?.value === 'variable') {
+              <app-variant-price [(priceRanges)]="priceRanges" />
+            }
 
             <!-- ============ PRECIOS POR DÍA ============ -->
             <app-day-prices [(dayGroups)]="dayGroups" />

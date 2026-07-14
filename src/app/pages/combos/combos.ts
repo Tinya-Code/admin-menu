@@ -37,7 +37,7 @@ export class Combos implements OnInit {
   protected selectedImage: File | null = null;
 
   protected deleteDialogOpen = signal(false);
-  protected deletingId = signal<string | null>(null);
+  protected deletingId = signal<number | null>(null);
   protected deleting = signal(false);
 
   ngOnInit(): void {
@@ -49,7 +49,7 @@ export class Combos implements OnInit {
     this.apiError.set(null);
     this.comboService.getAll().subscribe({
       next: (res) => {
-        this.combos.set(res.data);
+        this.combos.set(res);
         this.applyFilter();
         this.loading.set(false);
       },
@@ -105,23 +105,38 @@ export class Combos implements OnInit {
     if (!this.form.name.trim()) return;
     this.saving.set(true);
 
-    const formData = new FormData();
-    formData.append('name', this.form.name);
-    formData.append('description', this.form.description || '');
-    formData.append('price', String(this.form.price));
-    if (this.selectedImage) {
-      formData.append('image', this.selectedImage);
+    const body: { name: string; description?: string; price: number } = {
+      name: this.form.name,
+      price: this.form.price,
+    };
+    if (this.form.description) {
+      body.description = this.form.description;
     }
 
     const request = this.editingCombo()
-      ? this.comboService.update(this.editingCombo()!.id, formData)
-      : this.comboService.create(formData);
+      ? this.comboService.update(this.editingCombo()!.id, body)
+      : this.comboService.create(body);
 
     request.subscribe({
-      next: () => {
-        this.saving.set(false);
-        this.closeModal();
-        this.loadCombos();
+      next: (saved) => {
+        if (this.selectedImage && saved.id) {
+          this.comboService.uploadImage(saved.id, this.selectedImage).subscribe({
+            next: () => {
+              this.saving.set(false);
+              this.closeModal();
+              this.loadCombos();
+            },
+            error: () => {
+              this.saving.set(false);
+              this.closeModal();
+              this.loadCombos();
+            },
+          });
+        } else {
+          this.saving.set(false);
+          this.closeModal();
+          this.loadCombos();
+        }
       },
       error: () => {
         this.saving.set(false);
@@ -137,7 +152,7 @@ export class Combos implements OnInit {
 
   protected executeDelete(): void {
     const id = this.deletingId();
-    if (!id) return;
+    if (id === null) return;
 
     this.deleting.set(true);
     this.comboService.delete(id).subscribe({

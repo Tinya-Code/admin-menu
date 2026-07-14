@@ -1,6 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgClass } from '@angular/common';
 import { CategoryService } from '../../services/category.service';
 import { Category, CategoryForm } from '../../models/category';
 import { PaginationMeta } from '../../models/api-response';
@@ -21,7 +20,7 @@ import {
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [FormsModule, NgClass, Button, Modal, ConfirmDialog, SearchInput, LucidePlus, LucideAlertTriangle, LucideInbox, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight],
+  imports: [FormsModule, Button, Modal, ConfirmDialog, SearchInput, LucidePlus, LucideAlertTriangle, LucideInbox, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {

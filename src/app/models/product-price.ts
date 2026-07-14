@@ -1,22 +1,26 @@
 export type RuleType = 'DAY' | 'PROMOTION';
 
 export interface ProductPrice {
-  id?: string;
-  product_id?: string;
-  price: number;
-  start_day: number | null;
-  end_day: number | null;
-  start_datetime: string | null;
-  end_datetime: string | null;
-  rule_type: RuleType;
+  id?: number | string;
+  productId?: number | string;
+  price: string;
+  name?: string;
+  description?: string;
+  startDay: number | null;
+  endDay: number | null;
+  startDatetime: string | null;
+  endDatetime: string | null;
+  ruleType: RuleType;
 }
 
-export interface ProductPriceForm {
-  product_id?: string;
-  price: number;
-  rule_type: RuleType;
-  start_day?: number | null;
-  end_day?: number | null;
-  start_datetime?: string | null;
-  end_datetime?: string | null;
+export interface PriceRange {
+  id?: number;
+  productId?: number;
+  quantity: string;
+  unit: string;
+  price: string;
+  bonus: string | null;
+  isDefault: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }

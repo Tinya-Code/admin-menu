@@ -53,14 +53,26 @@ export class ProductForm implements OnInit {
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(255)]],
       description: ['', Validators.maxLength(1000)],
       categoryId: [null],
-      basePrice: [null, [Validators.required, Validators.min(0.01)]],
+      priceType: ['fixed', Validators.required],
+      basePrice: [null, [Validators.min(0.01)]],
       status: [true],
+    });
+
+    this.productForm.get('priceType')!.valueChanges.subscribe((type: string) => {
+      const basePriceCtrl = this.productForm.get('basePrice');
+      if (type === 'fixed') {
+        basePriceCtrl!.setValidators([Validators.required, Validators.min(0.01)]);
+      } else {
+        basePriceCtrl!.clearValidators();
+        basePriceCtrl!.setValue(null);
+      }
+      basePriceCtrl!.updateValueAndValidity();
     });
   }
 
   ngOnInit(): void {
     this.categoryService.getAll().subscribe({
-      next: (res) => this.categories.set(res.data),
+      next: (res) => this.categories.set(res),
     });
 
     const id = this.route.snapshot.paramMap.get('id');
@@ -79,53 +91,55 @@ export class ProductForm implements OnInit {
     this.loading.set(true);
     this.productService.getById(id).subscribe({
       next: (prodRes) => {
-        const product = prodRes.data;
-        this.existingImageUrl.set(product.image_url);
+        const product = prodRes;
+        this.existingImageUrl.set(product.imageUrl);
+        const hasPriceRanges = product.priceRanges && product.priceRanges.length > 0;
         this.productForm.patchValue({
           name: product.name,
           description: product.description,
-          categoryId: product.category_id,
-          basePrice: product.price,
-          status: product.is_active,
+          categoryId: product.categoryId,
+          priceType: hasPriceRanges ? 'variable' : 'fixed',
+          basePrice: product.price ? Number(product.price) : null,
+          status: product.isActive,
         });
 
         const dayPrices: DayGroupData[] = [];
         const promos: PromotionData[] = [];
         for (const p of product.prices ?? []) {
-          if (p.rule_type === 'DAY') {
-            const start = p.start_day ?? 1;
-            const end = p.end_day ?? 7;
+          if (p.ruleType === 'DAY') {
+            const start = p.startDay ?? 1;
+            const end = p.endDay ?? 7;
             const days: number[] = [];
             for (let d = start; d <= end; d++) {
               days.push(d === 7 ? 0 : d);
             }
             dayPrices.push({
-              id: p.id,
+              id: String(p.id),
               days,
-              price: p.price,
+              price: Number(p.price),
             });
           } else {
             promos.push({
-              id: p.id,
+              id: String(p.id),
               name: p.name ?? 'Promoción',
-              price: p.price,
-              startDate: p.start_datetime ?? '',
-              endDate: p.end_datetime ?? '',
+              price: Number(p.price),
+              startDate: p.startDatetime ?? '',
+              endDate: p.endDatetime ?? '',
             });
           }
         }
         this.dayGroups.set(dayPrices);
         this.promotions.set(promos);
 
-        const ranges: PriceRangeData[] = (product.price_ranges ?? []).map(
+        const ranges: PriceRangeData[] = (product.priceRanges ?? []).map(
           (r: any) => ({
             id: r.id,
-            quantity: r.quantity,
+            quantity: Number(r.quantity),
             unit: r.unit,
-            price: r.price,
+            price: Number(r.price),
             bonus: r.bonus ?? '',
             sort_order: r.sort_order ?? 0,
-            is_default: r.is_default ?? false,
+            is_default: r.isDefault ?? false,
           })
         );
         this.priceRanges.set(ranges);
@@ -166,8 +180,27 @@ export class ProductForm implements OnInit {
       formData.append('name', raw.name);
       formData.append('description', raw.description || '');
       formData.append('category_id', raw.categoryId ?? '');
-      formData.append('price', String(raw.basePrice));
-      formData.append('is_active', raw.status ? '1' : '0');
+      formData.append('is_active', raw.status ? 'true' : 'false');
+
+      if (raw.priceType === 'fixed') {
+        formData.append('price', String(raw.basePrice ?? 0));
+        formData.append('price_ranges', JSON.stringify([]));
+      } else {
+        formData.append('price', '0');
+        const priceRangesPayload = this.priceRanges().map((r, i) => {
+          const entry: any = {
+            quantity: r.quantity,
+            unit: r.unit,
+            price: r.price,
+            bonus: r.bonus || null,
+            sort_order: i,
+            is_default: r.is_default ? 1 : 0,
+          };
+          if (r.id) entry.id = r.id;
+          return entry;
+        });
+        formData.append('price_ranges', JSON.stringify(priceRangesPayload));
+      }
       if (this.selectedImage) {
         formData.append('image', this.selectedImage);
       } else if (this.isEditing() && this.existingImageUrl()) {
@@ -200,20 +233,6 @@ export class ProductForm implements OnInit {
         prices.push(entry);
       }
       formData.append('prices', JSON.stringify(prices));
-
-      const priceRangesPayload = this.priceRanges().map((r, i) => {
-        const entry: any = {
-          quantity: r.quantity,
-          unit: r.unit,
-          price: r.price,
-          bonus: r.bonus || null,
-          sort_order: i,
-          is_default: r.is_default ? 1 : 0,
-        };
-        if (r.id) entry.id = r.id;
-        return entry;
-      });
-      formData.append('price_ranges', JSON.stringify(priceRangesPayload));
 
       const productId = this.route.snapshot.paramMap.get('id');
       if (productId) {

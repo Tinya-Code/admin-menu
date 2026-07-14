@@ -1,40 +1,28 @@
+import { ProductPrice, PriceRange } from './product-price';
+
+export type { ProductPrice, PriceRange };
+
 export interface Product {
   id: number;
   name: string;
   description: string;
-  price: number;
-  category_id: string | null;
-  price_range_id: number | null;
-  image_url: string | null;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-  prices: {
-    id?: string;
-    product_id?: string;
-    name?: string;
-    price: number;
-    start_day: number | null;
-    end_day: number | null;
-    start_datetime: string | null;
-    end_datetime: string | null;
-    rule_type: 'DAY' | 'PROMOTION';
-  }[];
-  price_ranges?: {
-    id?: string;
-    quantity: number;
-    unit: string;
-    price: number;
-    bonus: string | null;
-    sort_order: number;
-    is_default: boolean;
-  }[];
+  price: string | null;
+  restaurantId: string;
+  categoryId: string | null;
+  imageUrl: string | null;
+  imagePublicId: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  prices?: ProductPrice[] | null;
+  priceRanges?: PriceRange[] | null;
 }
 
 export interface ProductFormData {
   name: string;
   description: string;
   categoryId: string | null;
-  basePrice: number;
+  priceType: 'fixed' | 'variable';
+  basePrice: number | null;
   status: boolean;
 }

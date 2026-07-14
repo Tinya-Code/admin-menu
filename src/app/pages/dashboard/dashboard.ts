@@ -43,9 +43,9 @@ export class Dashboard implements OnInit {
       next: (catRes) => {
         this.productService.getAll().subscribe({
           next: (prodRes) => {
-            const categories = catRes.data.length;
-            const products = prodRes.data.length;
-            const activeProducts = prodRes.data.filter((p) => p.is_active).length;
+            const categories = catRes.length;
+            const products = prodRes.length;
+            const activeProducts = prodRes.filter((p) => p.isActive).length;
             const inactiveProducts = products - activeProducts;
 
             this.stats.set([

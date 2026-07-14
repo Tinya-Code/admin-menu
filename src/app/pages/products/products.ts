@@ -54,7 +54,7 @@ export class Products implements OnInit {
     this.apiError.set(null);
     this.categoryService.getAll().subscribe({
       next: (catRes) => {
-        this.categories.set(catRes.data);
+        this.categories.set(catRes);
         this.loadProducts();
       },
       error: () => {
