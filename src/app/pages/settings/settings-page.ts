@@ -110,48 +110,56 @@ export class SettingsPage implements OnInit, OnDestroy {
     }));
   }
 
-  onConfigChange(section: keyof BusinessSettings, config: any): void {
+  onConfigChange(section: string, config: any): void {
     const settings = this.currentSettings();
     if (!settings) return;
 
-    // Handle restaurant-config special format
-    if (section === 'restaurant_config' && config.restaurant && config.settings) {
-      const previousRestaurant = settings.restaurant_config;
-      const isRestaurantDifferent = !this.isEqual(previousRestaurant, config.restaurant);
+    // Handle restaurant-config: flat structure with name, phone, address, location_lat, location_lng
+    if (section === 'restaurant' && config.name !== undefined) {
+      const isDifferent =
+        settings.name !== config.name ||
+        settings.phone !== config.phone ||
+        settings.address !== config.address ||
+        settings.location_lat !== config.location_lat ||
+        settings.location_lng !== config.location_lng;
 
-      if (!isRestaurantDifferent) return;
+      if (!isDifferent) return;
 
       this.currentSettings.set({
         ...settings,
-        restaurant_config: config.restaurant,
+        name: config.name,
+        phone: config.phone,
+        address: config.address,
+        location_lat: config.location_lat,
+        location_lng: config.location_lng,
       });
       this.hasUnsavedChanges.set(true);
       return;
     }
 
-    const previous = settings[section];
+    const previous = (settings as any)[section];
     const isDifferent = !this.isEqual(previous, config);
 
     if (!isDifferent) return;
     this.currentSettings.set({
       ...settings,
       [section]: config,
-    });
+    } as any);
     this.hasUnsavedChanges.set(true);
   }
 
   // Computed signals for derived state
   restaurantConfig = computed(() => {
     const settings = this.currentSettings();
-    return (
-      settings?.restaurant_config || {
-        name: '',
-        slug: '',
-        phone: '',
-        address: '',
-        location: { lat: 0, lng: 0 },
-      }
-    );
+    return {
+      name: settings?.name || '',
+      phone: settings?.phone || '',
+      address: settings?.address || '',
+      location: {
+        lat: settings?.location_lat || 0,
+        lng: settings?.location_lng || 0,
+      },
+    };
   });
 
   settingsConfig = computed(() => {
@@ -160,9 +168,6 @@ export class SettingsPage implements OnInit, OnDestroy {
       whatsapp_config: settings?.whatsapp_config || {},
       business_config: settings?.business_config || {},
       order_config: settings?.order_config || {},
-      description: settings?.description || '',
-      tags: settings?.tags || [],
-      logo_url: settings?.logo_url || null,
     };
   });
 
@@ -220,7 +225,7 @@ export class SettingsPage implements OnInit, OnDestroy {
   });
 
   saveSettings(): void {
-    if (!this.isFormValid()) {
+    if (!this.isCurrentTabValid()) {
       this.showError('Corrige los errores antes de guardar');
       return;
     }
@@ -230,23 +235,17 @@ export class SettingsPage implements OnInit, OnDestroy {
 
     this.saving.set(true);
 
-    // Build the payload in the expected format
+    // Build the payload in flat format for the API
     const payload = {
-      restaurant: settings.restaurant_config || {
-        name: '',
-        slug: '',
-        phone: '',
-        address: '',
-        location: { lat: 0, lng: 0 },
-      },
-      settings: {
-        whatsapp_config: settings.whatsapp_config,
-        business_config: settings.business_config,
-        order_config: settings.order_config,
-        description: settings.description || '',
-        tags: settings.tags || [],
-        logo_url: settings.logo_url || null,
-      },
+      name: settings.name,
+      phone: settings.phone,
+      address: settings.address,
+      location_lat: settings.location_lat,
+      location_lng: settings.location_lng,
+      whatsapp_config: settings.whatsapp_config,
+      business_config: settings.business_config,
+      order_config: settings.order_config,
+      display_config: settings.display_config,
     };
 
     this.settingsService

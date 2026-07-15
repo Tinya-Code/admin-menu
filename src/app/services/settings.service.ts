@@ -10,7 +10,7 @@ import { BusinessSettings, SettingsResponse } from '../models/settings';
 })
 export class SettingsService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiURL}/settings`;
+  private readonly apiUrl = `${environment.apiURL}/business-settings`;
 
   private readonly _cache = signal<BusinessSettings | null>(null);
   private readonly _lastFetchTime = signal<number>(0);
@@ -61,7 +61,7 @@ export class SettingsService {
       return this.getBusinessSettings();
     }
 
-    return this.http.post<ApiResponse<SettingsResponse>>(this.apiUrl, apiPayload).pipe(
+    return this.http.put<ApiResponse<SettingsResponse>>(this.apiUrl, apiPayload).pipe(
       map((response) => {
         if (response?.data) {
           return this.mapApiToUi(response.data);
@@ -77,41 +77,99 @@ export class SettingsService {
 
   /**
    * Mapear datos de la API al formato de la UI
-   * Recibe el objeto { restaurant, settings } directamente
+   * Recibe la estructura plana de business-settings
+   * Los configs vienen como strings JSON, los parsea
    */
   private mapApiToUi(data: SettingsResponse): BusinessSettings {
     return {
-      restaurant_id: data.restaurant?.slug || '',
-      restaurant_config: data.restaurant,
-      whatsapp_config: data.settings?.whatsapp_config,
-      business_config: data.settings?.business_config,
-      order_config: data.settings?.order_config,
-      display_config: data.settings?.display_config,
-      description: data.settings?.description,
-      tags: data.settings?.tags,
-      logo_url: data.settings?.logo_url,
-    } as BusinessSettings;
+      restaurant_id: data.restaurant_id || '',
+      name: data.name || '',
+      phone: typeof data.phone === 'string' ? data.phone.replace(/^\+51\s?/, '') : '',
+      address: data.address || '',
+      location_lat: Number(data.location_lat) || 0,
+      location_lng: Number(data.location_lng) || 0,
+      is_active: data.is_active === true || (data.is_active as any) === 1,
+      whatsapp_config: (() => {
+        const parsed = this.parseJsonConfig(data.whatsapp_config, {
+          enabled: false,
+          number: '',
+          message_template: '',
+          show_prices: true,
+          greeting: '',
+          auto_include_restaurant_name: true,
+        });
+        return {
+          ...parsed,
+          number: (parsed.number || '').replace(/^\+51/, ''),
+        };
+      })(),
+      business_config: this.parseJsonConfig(data.business_config, {
+        business_hours: {} as any,
+        timezone: '',
+        delivery_zones: [],
+        social_media: {},
+      }),
+      order_config: this.parseJsonConfig(data.order_config, {
+        enabled: false,
+        max_order_quantity: 10,
+        delivery_fee: 0,
+        payment_methods: [],
+        accepts_reservations: false,
+        delivery_enabled: false,
+        pickup_enabled: false,
+      }),
+      display_config: this.parseJsonConfig(data.display_config, {
+        show_images: true,
+        show_descriptions: true,
+        show_categories: true,
+        currency: '',
+        currency_symbol: '',
+        theme: 'light' as const,
+        colors: { primary: '', secondary: '' },
+        language: '',
+        show_availability_badge: true,
+      }),
+      created_at: data.created_at,
+      updated_at: data.updated_at,
+    };
+  }
+
+  private parseJsonConfig<T>(value: any, fallback: T): T {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value) as T;
+      } catch {
+        return fallback;
+      }
+    }
+    return (value as T) || fallback;
   }
 
   /**
    * Mapear datos de la UI al formato de la API
-   * Implementamos una lógica de filtrado para enviar solo lo que cambió o lo que es necesario.
+   * Envía estructura plana con campos del restaurant + configs
    */
   private mapUiToApi(data: Partial<BusinessSettings> | any): any {
     const apiData: any = {};
 
-    // Handle special format { restaurant, settings }
-    if (data.restaurant && data.settings) {
-      apiData.restaurant = data.restaurant;
-      apiData.settings = data.settings;
-      return apiData;
+    // Mapear campos del restaurant
+    if (data.name !== undefined) apiData.name = data.name;
+    if (data.phone !== undefined) {
+      const phone = data.phone || '';
+      apiData.phone = phone.startsWith('+51') ? phone : `+51${phone}`;
     }
+    if (data.address !== undefined) apiData.address = data.address;
+    if (data.location_lat !== undefined) apiData.location_lat = data.location_lat;
+    if (data.location_lng !== undefined) apiData.location_lng = data.location_lng;
+    if (data.is_active !== undefined) apiData.is_active = data.is_active;
 
     // Mapear whatsapp_config
     if (data.whatsapp_config) {
       apiData.whatsapp_config = {
         enabled: data.whatsapp_config.enabled,
-        number: data.whatsapp_config.number,
+        number: data.whatsapp_config.number?.startsWith('+51')
+          ? data.whatsapp_config.number
+          : `+51${data.whatsapp_config.number}`,
         message_template: data.whatsapp_config.message_template,
         show_prices: data.whatsapp_config.show_prices,
         greeting: data.whatsapp_config.greeting,
