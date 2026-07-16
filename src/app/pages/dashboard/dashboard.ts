@@ -21,7 +21,7 @@ interface StatCard {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [LucideDynamicIcon, LucideFolderTree, LucidePackage, LucideClipboardList, LucideTriangleAlert, PromotionsTable],
+  imports: [LucideDynamicIcon, LucideTriangleAlert, PromotionsTable],
   templateUrl: './dashboard.html',
 })
 export class Dashboard implements OnInit {

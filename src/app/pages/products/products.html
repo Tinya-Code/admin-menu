@@ -113,7 +113,14 @@
                     </div>
                   }
                   <div>
-                    <p class="text-sm font-medium text-gray-900">{{ prod.name }}</p>
+                    <div class="flex items-center gap-1.5">
+                      <p class="text-sm font-medium text-gray-900">{{ prod.name }}</p>
+                      @if (prod.isRecommended) {
+                        <span class="inline-flex items-center text-amber-500" title="Recomendado">
+                          <svg lucideStar class="w-3.5 h-3.5 fill-current"></svg>
+                        </span>
+                      }
+                    </div>
                     <p class="text-xs text-gray-500 truncate max-w-[200px]">
                       {{ prod.description }}
                     </p>
@@ -189,7 +196,14 @@
             <div class="flex-1 min-w-0">
               <div class="flex items-start justify-between">
                 <div>
-                  <p class="text-sm font-medium text-gray-900">{{ prod.name }}</p>
+                  <div class="flex items-center gap-1.5">
+                    <p class="text-sm font-medium text-gray-900">{{ prod.name }}</p>
+                    @if (prod.isRecommended) {
+                      <span class="inline-flex items-center text-amber-500">
+                        <svg lucideStar class="w-3.5 h-3.5 fill-current"></svg>
+                      </span>
+                    }
+                  </div>
                   <p class="text-xs text-gray-500">{{ getCategoryName(prod.categoryId) }}</p>
                 </div>
                 <div class="flex gap-1">

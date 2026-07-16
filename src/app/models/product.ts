@@ -16,6 +16,7 @@ export interface Product {
   updatedAt: string;
   prices?: ProductPrice[] | null;
   priceRanges?: PriceRange[] | null;
+  isRecommended?: boolean;
 }
 
 export interface ProductFormData {
