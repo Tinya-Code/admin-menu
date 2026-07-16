@@ -117,35 +117,40 @@ export interface Location {
 
 export interface RestaurantConfig {
   name: string;
-  slug: string;
+  slug?: string;
   phone: string;
   address: string;
   location: Location;
 }
 
 export interface SettingsResponse {
-  restaurant: RestaurantConfig;
-  settings: {
-    whatsapp_config: WhatsAppConfig;
-    business_config: BusinessConfig;
-    order_config: OrderConfig;
-    display_config?: DisplayConfig;
-    description?: string;
-    tags?: string[];
-    logo_url?: string | null;
-  };
-}
-
-export interface BusinessSettings {
   restaurant_id: string;
-  restaurant_config?: RestaurantConfig;
+  name: string;
+  phone: string;
+  address: string;
+  location_lat: number;
+  location_lng: number;
+  is_active: boolean;
   whatsapp_config: WhatsAppConfig;
   display_config: DisplayConfig;
   order_config: OrderConfig;
   business_config: BusinessConfig;
-  description?: string;
-  tags?: string[];
-  logo_url?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BusinessSettings {
+  restaurant_id: string;
+  name: string;
+  phone: string;
+  address: string;
+  location_lat: number;
+  location_lng: number;
+  is_active: boolean;
+  whatsapp_config: WhatsAppConfig;
+  display_config: DisplayConfig;
+  order_config: OrderConfig;
+  business_config: BusinessConfig;
   created_at?: string;
   updated_at?: string;
 }

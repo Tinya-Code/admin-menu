@@ -59,6 +59,7 @@ export class GalleryService {
   update(id: string, formData: FormData): Observable<ApiResponse<Gallery>> {
     return this.http.put<any>(`${this.apiUrl}/${id}`, formData).pipe(
       map((res) => ({ ...res, data: normalizeGallery(res.data ?? res) }))
+
     );
   }
 

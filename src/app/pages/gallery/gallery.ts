@@ -128,7 +128,7 @@ export class Gallery implements OnInit {
   protected openEdit(photo: GalleryModel): void {
     this.editingEvent.set(photo);
     this.form = {
-      name: photo.name,
+      name: photo.title,
       description: photo.description || '',
     };
     this.selectedImage = null;

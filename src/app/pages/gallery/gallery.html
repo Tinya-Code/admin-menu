@@ -96,7 +96,7 @@
                   <div class="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 bg-white">
                     <img
                       [src]="evt.image_url"
-                      [alt]="evt.name"
+                      [alt]="evt.title"
                       class="w-full h-full object-cover"
                     />
                   </div>
@@ -119,7 +119,7 @@
                 }
               </td>
               <td class="px-6 py-4">
-                <p class="text-sm font-medium text-gray-900">{{ evt.name }}</p>
+                <p class="text-sm font-medium text-gray-900">{{ evt.title }}</p>
               </td>
               <td class="px-6 py-4">
                 <p class="text-sm text-gray-500 truncate max-w-xs">{{ evt.description }}</p>
@@ -157,11 +157,11 @@
               <div
                 class="w-14 h-14 rounded-lg overflow-hidden border border-gray-200 shrink-0 bg-white"
               >
-                <img [src]="evt.image_url" [alt]="evt.name" class="w-full h-full object-cover" />
+                <img [src]="evt.image_url" [alt]="evt.title" class="w-full h-full object-cover" />
               </div>
             }
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-900">{{ evt.name }}</p>
+              <p class="text-sm font-medium text-gray-900">{{ evt.title }}</p>
               @if (evt.description) {
                 <p class="text-xs text-gray-500 mt-1 truncate">{{ evt.description }}</p>
               }
