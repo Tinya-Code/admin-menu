@@ -12,7 +12,7 @@ interface MessageResponse {
 function normalizeGallery(item: any): Gallery {
   return {
     id: String(item.id),
-    name: item.title ?? item.name ?? '',
+    title: item.title ?? item.name ?? '',
     description: item.description ?? '',
     image_url: item.imageUrl ?? item.image_url ?? '',
     created_at: item.createdAt ?? item.created_at ?? '',
