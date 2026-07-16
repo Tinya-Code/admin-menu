@@ -38,6 +38,7 @@ function defaultsProduct(p: any): Product {
     ...p,
     price: p.price ?? null,
     isActive: p.isActive ?? true,
+    isRecommended: p.isRecommended ?? p.is_recommended ?? p.isRecomended ?? p.is_recomended ?? false,
     categoryId: p.categoryId ?? null,
     imageUrl: p.imageUrl ?? null,
     imagePublicId: p.imagePublicId ?? null,

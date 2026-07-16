@@ -56,6 +56,7 @@ export class ProductForm implements OnInit {
       priceType: ['fixed', Validators.required],
       basePrice: [null, [Validators.min(0.01)]],
       status: [true],
+      isRecommended: [false],
     });
 
     this.productForm.get('priceType')!.valueChanges.subscribe((type: string) => {
@@ -101,6 +102,7 @@ export class ProductForm implements OnInit {
           priceType: hasPriceRanges ? 'variable' : 'fixed',
           basePrice: product.price ? Number(product.price) : null,
           status: product.isActive,
+          isRecommended: product.isRecommended ?? false,
         });
 
         const dayPrices: DayGroupData[] = [];
@@ -167,6 +169,11 @@ export class ProductForm implements OnInit {
     c?.setValue(!c?.value);
   }
 
+  protected toggleRecommended(): void {
+    const c = this.productForm.get('isRecommended');
+    c?.setValue(!c?.value);
+  }
+
   protected async save(): Promise<void> {
     if (this.productForm.invalid) {
       this.productForm.markAllAsTouched();
@@ -181,6 +188,8 @@ export class ProductForm implements OnInit {
       formData.append('description', raw.description || '');
       formData.append('category_id', raw.categoryId ?? '');
       formData.append('is_active', raw.status ? 'true' : 'false');
+      formData.append('is_recommended', raw.isRecommended ? 'true' : 'false');
+      formData.append('is_recomended', raw.isRecommended ? 'true' : 'false');
 
       if (raw.priceType === 'fixed') {
         formData.append('price', String(raw.basePrice ?? 0));

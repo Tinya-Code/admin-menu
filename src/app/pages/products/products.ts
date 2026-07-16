@@ -18,12 +18,13 @@ import {
   LucideTrash2,
   LucideChevronLeft,
   LucideChevronRight,
+  LucideStar,
 } from '@lucide/angular';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [Button, ConfirmDialog, SearchInput, LucidePlus, LucideTriangleAlert, LucidePackage, LucideImage, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight],
+  imports: [Button, ConfirmDialog, SearchInput, LucidePlus, LucideTriangleAlert, LucidePackage, LucideImage, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight, LucideStar],
   templateUrl: './products.html',
 })
 export class Products implements OnInit {

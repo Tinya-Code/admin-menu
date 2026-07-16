@@ -81,24 +81,47 @@
             </div>
           </div>
 
-          <!-- Status -->
-          <div class="flex items-center gap-3">
-            <button
-              type="button"
-              role="switch"
-              [attr.aria-checked]="productForm.get('status')?.value"
-              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-              [class.bg-primary]="productForm.get('status')?.value"
-              [class.bg-gray-300]="!productForm.get('status')?.value"
-              (click)="toggleStatus()"
-            >
-              <span
-                class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm"
-                [class.translate-x-6]="productForm.get('status')?.value"
-                [class.translate-x-1]="!productForm.get('status')?.value"
-              ></span>
-            </button>
-            <span class="text-sm text-gray-700">Producto activo</span>
+          <!-- Status & Recommendation -->
+          <div class="flex flex-wrap items-center gap-6">
+            <!-- Status -->
+            <div class="flex items-center gap-3">
+              <button
+                type="button"
+                role="switch"
+                [attr.aria-checked]="productForm.get('status')?.value"
+                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                [class.bg-primary]="productForm.get('status')?.value"
+                [class.bg-gray-300]="!productForm.get('status')?.value"
+                (click)="toggleStatus()"
+              >
+                <span
+                  class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm"
+                  [class.translate-x-6]="productForm.get('status')?.value"
+                  [class.translate-x-1]="!productForm.get('status')?.value"
+                ></span>
+              </button>
+              <span class="text-sm text-gray-700">Producto activo</span>
+            </div>
+
+            <!-- Recommendation -->
+            <div class="flex items-center gap-3">
+              <button
+                type="button"
+                role="switch"
+                [attr.aria-checked]="productForm.get('isRecommended')?.value"
+                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                [class.bg-primary]="productForm.get('isRecommended')?.value"
+                [class.bg-gray-300]="!productForm.get('isRecommended')?.value"
+                (click)="toggleRecommended()"
+              >
+                <span
+                  class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm"
+                  [class.translate-x-6]="productForm.get('isRecommended')?.value"
+                  [class.translate-x-1]="!productForm.get('isRecommended')?.value"
+                ></span>
+              </button>
+              <span class="text-sm text-gray-700">Destacado / Recomendado</span>
+            </div>
           </div>
 
           <!-- Tipo de Precio -->
