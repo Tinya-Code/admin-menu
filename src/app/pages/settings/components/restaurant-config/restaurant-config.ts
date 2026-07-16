@@ -65,22 +65,12 @@ export class RestaurantConfig implements OnInit {
   }
 
   private emitConfigChange(formValues: any): void {
-    const slug = this.generateSlug(formValues.name);
-
     const payload = {
-      restaurant: {
-        name: formValues.name,
-        slug: slug,
-        phone: formValues.phone,
-        address: formValues.address,
-        location: {
-          lat: formValues.location.lat,
-          lng: formValues.location.lng,
-        },
-      },
-      settings: {
-        ...this.settingsConfig(),
-      },
+      name: formValues.name,
+      phone: formValues.phone,
+      address: formValues.address,
+      location_lat: formValues.location.lat,
+      location_lng: formValues.location.lng,
     };
 
     this.configChange.emit(payload);

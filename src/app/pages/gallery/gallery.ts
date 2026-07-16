@@ -128,7 +128,7 @@ export class Gallery implements OnInit {
   protected openEdit(photo: GalleryModel): void {
     this.editingEvent.set(photo);
     this.form = {
-      name: photo.name,
+      name: photo.title,
       description: photo.description || '',
     };
     this.selectedImage = null;
@@ -156,7 +156,7 @@ export class Gallery implements OnInit {
     this.saving.set(true);
 
     const formData = new FormData();
-    formData.append('name', this.form.name);
+    formData.append('title', this.form.name);
     formData.append('description', this.form.description || '');
     if (this.selectedImage) {
       formData.append('image', this.selectedImage);
