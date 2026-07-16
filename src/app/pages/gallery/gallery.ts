@@ -61,7 +61,7 @@ export class Gallery implements OnInit {
   protected imagePreview = signal<string | null>(null);
 
   protected isFormValid(): boolean {
-    const hasName = this.form.name.trim().length > 0;
+    const hasName = (this.form.name ?? '').trim().length > 0;
     const hasImage = !!this.selectedImage || !!this.editingEvent()?.image_url;
     return hasName && hasImage;
   }
@@ -156,11 +156,11 @@ export class Gallery implements OnInit {
     this.saving.set(true);
 
     const formData = new FormData();
-    formData.append('name', this.form.name);
+    formData.append('title', this.form.name);
     formData.append('description', this.form.description || '');
     if (this.selectedImage) {
       formData.append('image', this.selectedImage);
-    } else if (this.editingEvent()?.image_url) {
+    } else if (this.editingEvent() && this.editingEvent()!.image_url) {
       formData.append('image_url', this.editingEvent()!.image_url);
     }
 
