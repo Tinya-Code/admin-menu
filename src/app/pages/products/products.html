@@ -131,9 +131,7 @@
                 <span class="text-sm text-gray-600">{{ getCategoryName(prod.categoryId) }}</span>
               </td>
               <td class="px-6 py-4 text-right">
-                <span class="text-sm font-semibold text-gray-900"
-                  >S/{{ prod.price != null ? (+prod.price).toFixed(2) : '—' }}</span
-                >
+                <span class="text-sm font-semibold text-gray-900">{{ getDisplayPrice(prod) }}</span>
               </td>
               <td class="px-6 py-4">
                 @if (prod.isActive) {
@@ -222,9 +220,7 @@
                 </div>
               </div>
               <div class="flex items-center justify-between mt-2">
-                <span class="text-sm font-semibold text-gray-900"
-                  >S/{{ prod.price != null ? (+prod.price).toFixed(2) : '—' }}</span
-                >
+                <span class="text-sm font-semibold text-gray-900">{{ getDisplayPrice(prod) }}</span>
                 @if (prod.isActive) {
                   <span
                     class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700"

@@ -1,5 +1,6 @@
-import { Component, input, output, model } from '@angular/core';
+import { Component, input, output, model, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-search-input',
@@ -16,7 +17,7 @@ import { FormsModule } from '@angular/forms';
       </svg>
       <input
         [ngModel]="searchTerm()"
-        (ngModelChange)="searchTerm.set($event); onSearch.emit($event)"
+        (ngModelChange)="onInput($event)"
         [placeholder]="placeholder()"
         class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm
                focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent
@@ -26,8 +27,33 @@ import { FormsModule } from '@angular/forms';
     </div>
   `,
 })
-export class SearchInput {
+export class SearchInput implements OnInit, OnDestroy {
   readonly placeholder = input('Buscar...');
   readonly searchTerm = model('');
   readonly onSearch = output<string>();
+
+  private searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
+
+  ngOnInit(): void {
+    this.searchSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((value) => {
+        this.searchTerm.set(value);
+        this.onSearch.emit(value);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  protected onInput(value: string): void {
+    this.searchSubject.next(value);
+  }
 }

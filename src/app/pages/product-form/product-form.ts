@@ -164,6 +164,13 @@ export class ProductForm implements OnInit {
     this.selectedImage = file;
   }
 
+  protected onImageDelete(deleted: boolean): void {
+    if (deleted) {
+      this.existingImageUrl.set(null);
+      this.selectedImage = null;
+    }
+  }
+
   protected toggleStatus(): void {
     const c = this.productForm.get('status');
     c?.setValue(!c?.value);
@@ -212,8 +219,8 @@ export class ProductForm implements OnInit {
       }
       if (this.selectedImage) {
         formData.append('image', this.selectedImage);
-      } else if (this.isEditing() && this.existingImageUrl()) {
-        formData.append('image_url', this.existingImageUrl()!);
+      } else if (this.isEditing()) {
+        formData.append('image_url', this.existingImageUrl() ?? '');
       }
 
       // Build prices array as JSON
