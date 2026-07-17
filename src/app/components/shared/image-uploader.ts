@@ -1,4 +1,4 @@
-import { Component, input, output, signal, ViewChild, ElementRef } from '@angular/core';
+import { Component, input, output, signal, ViewChild, ElementRef, OnChanges, SimpleChanges } from '@angular/core';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE = 5 * 1024 * 1024;
@@ -106,7 +106,7 @@ const MAX_SIZE = 5 * 1024 * 1024;
     </div>
   `,
 })
-export class ImageUploader {
+export class ImageUploader implements OnChanges {
   readonly currentUrl = input<string | null>(null);
   readonly onFileChange = output<File | null>();
   readonly onDelete = output<boolean>();
@@ -119,6 +119,18 @@ export class ImageUploader {
   protected error = signal<string | null>(null);
   protected selectedFile: File | null = null;
   protected deleted = signal(false);
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['currentUrl']) {
+      this.previewUrl.set(null);
+      this.fileName.set('');
+      this.fileSize.set('');
+      this.error.set(null);
+      this.selectedFile = null;
+      this.deleted.set(false);
+      this.onFileChange.emit(null);
+    }
+  }
 
   private validate(file: File): boolean {
     this.error.set(null);
