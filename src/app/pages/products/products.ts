@@ -96,6 +96,18 @@ export class Products implements OnInit {
     return this.categories().find((c) => c.id === id)?.name || '—';
   }
 
+  getDisplayPrice(prod: Product): string {
+    if (prod.price != null) {
+      return `S/${(+prod.price).toFixed(2)}`;
+    }
+    const ranges = prod.priceRanges;
+    if (ranges && ranges.length > 0) {
+      const min = Math.min(...ranges.map((r) => +r.price));
+      return `Desde S/${min.toFixed(2)}`;
+    }
+    return '—';
+  }
+
   protected openCreate(): void {
     this.router.navigate(['/products/new']);
   }

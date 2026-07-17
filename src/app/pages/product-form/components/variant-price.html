@@ -17,7 +17,11 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-900">
-                {{ range.quantity }} {{ formatUnit(range.quantity, range.unit) }}
+                Cantidad: {{ range.quantity }}
+                <!-- badge para la unidad -->
+                <span class="ml-1 px-2 py-0.5 text-xs bg-gray-200 rounded-full uppercase">
+                  {{ formatUnit(range.quantity, range.unit) }}
+                </span>
                 @if (range.is_default) {
                   <span class="text-xs text-primary ml-1">(Predeterminado)</span>
                 }
@@ -99,7 +103,7 @@
             />
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Unidad</label>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Presentación</label>
             <select
               [formControl]="form.unit"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"

@@ -35,6 +35,8 @@ export class Combos implements OnInit {
   protected saving = signal(false);
   protected form: ComboForm = { name: '', description: '', price: 0 };
   protected selectedImage: File | null = null;
+  protected existingImageUrl = signal<string | null>(null);
+  protected modalKey = signal(0);
 
   protected deleteDialogOpen = signal(false);
   protected deletingId = signal<number | null>(null);
@@ -79,6 +81,8 @@ export class Combos implements OnInit {
     this.editingCombo.set(null);
     this.form = { name: '', description: '', price: 0 };
     this.selectedImage = null;
+    this.existingImageUrl.set(null);
+    this.modalKey.update((k) => k + 1);
     this.modalOpen.set(true);
   }
 
@@ -90,6 +94,7 @@ export class Combos implements OnInit {
       price: combo.price,
     };
     this.selectedImage = null;
+    this.existingImageUrl.set(combo.image_url || null);
     this.modalOpen.set(true);
   }
 

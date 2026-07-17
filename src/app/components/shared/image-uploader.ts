@@ -1,4 +1,4 @@
-import { Component, input, output, signal, ViewChild, ElementRef } from '@angular/core';
+import { Component, input, output, signal, ViewChild, ElementRef, OnChanges, SimpleChanges } from '@angular/core';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE = 5 * 1024 * 1024;
@@ -47,7 +47,7 @@ const MAX_SIZE = 5 * 1024 * 1024;
             </div>
           </div>
         </div>
-      } @else if (currentUrl()) {
+      } @else if (currentUrl() && !deleted()) {
         <!-- Existing image -->
         <div class="bg-gray-50 rounded-xl border border-gray-200 p-4">
           <div class="flex items-start gap-4">
@@ -56,13 +56,22 @@ const MAX_SIZE = 5 * 1024 * 1024;
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-sm text-gray-500">Imagen actual</p>
-              <button
-                type="button"
-                class="text-xs text-[var(--color-primary)] font-medium hover:underline mt-2"
-                (click)="openFilePicker()"
-              >
-                Reemplazar imagen
-              </button>
+              <div class="flex gap-2 mt-2">
+                <button
+                  type="button"
+                  class="text-xs text-[var(--color-primary)] font-medium hover:underline"
+                  (click)="openFilePicker()"
+                >
+                  Reemplazar
+                </button>
+                <button
+                  type="button"
+                  class="text-xs text-red-600 font-medium hover:underline"
+                  (click)="removeExisting()"
+                >
+                  Eliminar
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -97,9 +106,10 @@ const MAX_SIZE = 5 * 1024 * 1024;
     </div>
   `,
 })
-export class ImageUploader {
+export class ImageUploader implements OnChanges {
   readonly currentUrl = input<string | null>(null);
   readonly onFileChange = output<File | null>();
+  readonly onDelete = output<boolean>();
 
   @ViewChild('fileInput') fileInputRef?: ElementRef<HTMLInputElement>;
 
@@ -108,6 +118,19 @@ export class ImageUploader {
   protected fileSize = signal('');
   protected error = signal<string | null>(null);
   protected selectedFile: File | null = null;
+  protected deleted = signal(false);
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['currentUrl']) {
+      this.previewUrl.set(null);
+      this.fileName.set('');
+      this.fileSize.set('');
+      this.error.set(null);
+      this.selectedFile = null;
+      this.deleted.set(false);
+      this.onFileChange.emit(null);
+    }
+  }
 
   private validate(file: File): boolean {
     this.error.set(null);
@@ -170,6 +193,11 @@ export class ImageUploader {
     this.fileSize.set('');
     this.error.set(null);
     this.onFileChange.emit(null);
+  }
+
+  protected removeExisting(): void {
+    this.deleted.set(true);
+    this.onDelete.emit(true);
   }
 
   private formatSize(bytes: number): string {

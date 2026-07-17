@@ -73,7 +73,7 @@ export class Gallery implements OnInit {
   protected loadEvents(): void {
     this.loading.set(true);
     this.apiError.set(null);
-    this.galleryService.getAll(this.currentPage(), this.pageSize()).subscribe({
+    this.galleryService.getAll(this.currentPage(), this.pageSize(), this.searchTerm()).subscribe({
       next: (res) => {
         this.events.set(res.data ?? []);
         this.meta.set(res.meta ?? null);

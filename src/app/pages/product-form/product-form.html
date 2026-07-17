@@ -147,8 +147,8 @@
                   }
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-gray-900">Precio Fijo</p>
-                  <p class="text-xs text-gray-500">Un solo precio base</p>
+                  <p class="text-left text-sm font-medium text-gray-900">Precio Fijo</p>
+                  <p class="text-left text-xs text-gray-500">Un solo precio base</p>
                 </div>
               </button>
               <button
@@ -170,8 +170,8 @@
                   }
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-gray-900">Precio Variable</p>
-                  <p class="text-xs text-gray-500">Precios por cantidad/unidad</p>
+                  <p class="text-left text-sm font-medium text-gray-900">Precio Variable</p>
+                  <p class="text-left text-xs text-gray-500">Precios por cantidad/unidad</p>
                 </div>
               </button>
             </div>
@@ -183,9 +183,7 @@
               <label class="block text-sm font-semibold text-gray-900 mb-1"
                 >Precio Base <span class="text-red-500">*</span></label
               >
-              <p class="text-xs text-gray-400 mb-3">
-                Este será el precio del producto.
-              </p>
+              <p class="text-xs text-gray-400 mb-3">Este será el precio del producto.</p>
               <div class="relative">
                 <span
                   class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm"
@@ -230,6 +228,7 @@
           <app-image-uploader
             [currentUrl]="existingImageUrl()"
             (onFileChange)="onImageChange($event)"
+            (onDelete)="onImageDelete($event)"
           />
         </div>
       </div>

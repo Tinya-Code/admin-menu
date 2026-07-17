@@ -25,42 +25,46 @@ export class GalleryService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiURL}/gallery`;
 
-  getAll(page: number = 1, limit: number = 10): Observable<ApiResponse<Gallery[]>> {
-    const params = new HttpParams()
+  getAll(page: number = 1, limit: number = 10, search: string = ''): Observable<ApiResponse<Gallery[]>> {
+    let params = new HttpParams()
       .set('page', page)
       .set('limit', limit)
       .set('order_by', 'date')
       .set('sortDirection', 'ASC');
+    if (search) {
+      params = params.set('search', search);
+    }
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map((res) => {
         const rawItems: any[] = res.data?.data ?? res.data ?? [];
         const data: Gallery[] = rawItems.map(normalizeGallery);
         const pagination = res.pagination ?? res.data?.pagination ?? res.meta ?? null;
         const meta = pagination
-          ? (pagination.totalPages !== undefined ? normalizePagination(pagination) : pagination)
+          ? pagination.totalPages !== undefined
+            ? normalizePagination(pagination)
+            : pagination
           : null;
         return { ...res, data, meta };
-      })
+      }),
     );
   }
 
   getById(id: string): Observable<ApiResponse<Gallery>> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
-      map((res) => ({ ...res, data: normalizeGallery(res.data ?? res) }))
-    );
+    return this.http
+      .get<any>(`${this.apiUrl}/${id}`)
+      .pipe(map((res) => ({ ...res, data: normalizeGallery(res.data ?? res) })));
   }
 
   create(formData: FormData): Observable<ApiResponse<Gallery>> {
-    return this.http.post<any>(this.apiUrl, formData).pipe(
-      map((res) => ({ ...res, data: normalizeGallery(res.data ?? res) }))
-    );
+    return this.http
+      .post<any>(this.apiUrl, formData)
+      .pipe(map((res) => ({ ...res, data: normalizeGallery(res.data ?? res) })));
   }
 
   update(id: string, formData: FormData): Observable<ApiResponse<Gallery>> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, formData).pipe(
-      map((res) => ({ ...res, data: normalizeGallery(res.data ?? res) }))
-
-    );
+    return this.http
+      .put<any>(`${this.apiUrl}/${id}`, formData)
+      .pipe(map((res) => ({ ...res, data: normalizeGallery(res.data ?? res) })));
   }
 
   delete(id: string): Observable<MessageResponse> {

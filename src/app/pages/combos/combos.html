@@ -205,10 +205,12 @@
     </div>
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-2">Imagen</label>
-      <app-image-uploader
-        [currentUrl]="editingCombo()?.image_url ?? null"
-        (onFileChange)="onImageChange($event)"
-      />
+      @for (key of [modalKey()]; track key) {
+        <app-image-uploader
+          [currentUrl]="existingImageUrl()"
+          (onFileChange)="onImageChange($event)"
+        />
+      }
     </div>
     <div class="flex justify-end gap-3 pt-2">
       <app-button type="button" variant="secondary" (onClick)="closeModal()">Cancelar</app-button>
