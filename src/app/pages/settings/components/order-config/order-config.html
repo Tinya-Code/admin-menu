@@ -91,64 +91,65 @@
       </div>
       <div class="mt-1 text-xs text-gray-500">Selecciona los métodos de pago que aceptas</div>
     </div>
-
-    <!-- Opciones Adicionales -->
-    <div class="form-group">
-      <label class="block text-sm font-medium text-gray-700 mb-3"> Opciones Adicionales </label>
-      <div class="space-y-3 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Delivery -->
-        <div
-          class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
-        >
-          <div>
-            <div class="text-sm font-medium text-gray-900">Delivery Disponible</div>
-            <div class="text-xs text-gray-500">Ofrece servicio de delivery a domicilio</div>
-          </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" formControlName="delivery_enabled" class="sr-only peer" />
-            <div
-              class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-              [class.opacity-50]="!isFormEnabled"
-            ></div>
-          </label>
-        </div>
-        <!-- Costo de Delivery -->
-        <div class="form-group">
-          <label for="delivery-fee" class="block text-sm font-medium text-gray-700 mb-2">
-            Costo de Delivery
-          </label>
-          <div class="relative">
-            <span
-              class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium"
-            >
-              S/
-            </span>
-            <input
-              id="delivery-fee"
-              type="number"
-              formControlName="delivery_fee"
-              class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 hover:border-gray-400 focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:outline-offset-2 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-              [class.border-red-500]="
-                orderForm.get('delivery_fee')?.invalid && orderForm.get('delivery_fee')?.touched
-              "
-              [class.shadow-red-100]="
-                orderForm.get('delivery_fee')?.invalid && orderForm.get('delivery_fee')?.touched
-              "
-            />
-          </div>
-          @if (orderForm.get('delivery_fee')?.invalid && orderForm.get('delivery_fee')?.touched) {
-            <div class="mt-1 text-xs text-red-600">
-              {{ getDeliveryFeeErrorMessage() }}
+    @if (featuresService.deliveryOptions) {
+      <!-- Opciones Adicionales -->
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-3"> Opciones Adicionales </label>
+        <div class="space-y-3 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Delivery -->
+          <div
+            class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
+          >
+            <div>
+              <div class="text-sm font-medium text-gray-900">Delivery Disponible</div>
+              <div class="text-xs text-gray-500">Ofrece servicio de delivery a domicilio</div>
             </div>
-          }
-          <div class="mt-1 text-xs text-gray-500">
-            Costo fijo de delivery para todos los pedidos
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" formControlName="delivery_enabled" class="sr-only peer" />
+              <div
+                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                [class.opacity-50]="!isFormEnabled"
+              ></div>
+            </label>
+          </div>
+          <!-- Costo de Delivery -->
+          <div class="form-group">
+            <label for="delivery-fee" class="block text-sm font-medium text-gray-700 mb-2">
+              Costo de Delivery
+            </label>
+            <div class="relative">
+              <span
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium"
+              >
+                S/
+              </span>
+              <input
+                id="delivery-fee"
+                type="number"
+                formControlName="delivery_fee"
+                class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 hover:border-gray-400 focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:outline-offset-2 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                [class.border-red-500]="
+                  orderForm.get('delivery_fee')?.invalid && orderForm.get('delivery_fee')?.touched
+                "
+                [class.shadow-red-100]="
+                  orderForm.get('delivery_fee')?.invalid && orderForm.get('delivery_fee')?.touched
+                "
+              />
+            </div>
+            @if (orderForm.get('delivery_fee')?.invalid && orderForm.get('delivery_fee')?.touched) {
+              <div class="mt-1 text-xs text-red-600">
+                {{ getDeliveryFeeErrorMessage() }}
+              </div>
+            }
+            <div class="mt-1 text-xs text-gray-500">
+              Costo fijo de delivery para todos los pedidos
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    }
   </div>
 </form>

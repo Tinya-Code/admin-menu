@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, input, OnInit, output } from '@angular/core';
+import { Component, computed, inject, input, OnInit, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   OrderConfig as OrderConfigModel,
@@ -7,6 +7,7 @@ import {
   PAYMENT_METHODS,
   PaymentMethod,
 } from '../../../../models/settings';
+import { FeaturesService } from '../../../../services/features.service';
 
 @Component({
   selector: 'app-order-config',
@@ -29,6 +30,7 @@ export class OrderConfig implements OnInit {
   isValid = output<boolean>();
 
   readonly paymentMethods = PAYMENT_METHODS;
+  protected readonly featuresService = inject(FeaturesService);
 
   private fb = inject(FormBuilder);
 

@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth.service';
+import { FeaturesService } from './services/features.service';
 import { Toast } from './components/shared/toast';
 
 @Component({
@@ -22,6 +23,15 @@ import { Toast } from './components/shared/toast';
     }
   `,
 })
-export class App {
+export class App implements OnInit {
   protected authService = inject(AuthService);
+  private featuresService = inject(FeaturesService);
+
+  ngOnInit(): void {
+    this.authService.ready$.subscribe((ready) => {
+      if (ready && this.authService.isAuthenticated) {
+        this.featuresService.load().subscribe();
+      }
+    });
+  }
 }
