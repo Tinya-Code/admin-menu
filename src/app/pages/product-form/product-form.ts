@@ -124,6 +124,7 @@ export class ProductForm implements OnInit {
             promos.push({
               id: String(p.id),
               name: p.name ?? 'Promoción',
+              description: p.description ?? '',
               price: Number(p.price),
               startDate: p.startDatetime ?? '',
               endDate: p.endDatetime ?? '',
@@ -240,6 +241,7 @@ export class ProductForm implements OnInit {
       for (const promo of this.promotions()) {
         const entry: any = {
           name: promo.name,
+          description: promo.description || null,
           price: promo.price,
           rule_type: 'PROMOTION',
           start_datetime: promo.startDate ? promo.startDate.replace('T', ' ') + (promo.startDate.includes(':00') ? '' : ':00') : null,

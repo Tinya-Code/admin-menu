@@ -5,6 +5,7 @@ import { LucidePencil, LucideTrash2 } from '@lucide/angular';
 export interface PromotionData {
   id?: string;
   name: string;
+  description: string;
   price: number;
   startDate: string;
   endDate: string;
@@ -54,6 +55,7 @@ export class Promotions {
   constructor() {
     this.form = this.fb.group({
       name: ['', Validators.required],
+      description: [''],
       price: [0, [Validators.required, Validators.min(0.01)]],
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
@@ -61,7 +63,7 @@ export class Promotions {
   }
 
   openForm(): void {
-    this.form.reset({ name: '', price: 0, startDate: '', endDate: '' });
+    this.form.reset({ name: '', description: '', price: 0, startDate: '', endDate: '' });
     this.form.setValidators(dateRangeValidator(false));
     this.form.updateValueAndValidity();
     this.form.markAsPristine();
@@ -73,6 +75,7 @@ export class Promotions {
   onEdit(item: PromotionData): void {
     this.form.setValue({
       name: item.name,
+      description: item.description,
       price: item.price,
       startDate: item.startDate,
       endDate: item.endDate,
@@ -98,6 +101,7 @@ export class Promotions {
     const raw = this.form.value;
     const promo: PromotionData = {
       name: raw.name,
+      description: raw.description,
       price: raw.price,
       startDate: raw.startDate,
       endDate: raw.endDate,

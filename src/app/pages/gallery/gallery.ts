@@ -11,6 +11,7 @@ import {
 } from '@lucide/angular';
 import { Button } from '../../components/shared/button';
 import { ConfirmDialog } from '../../components/shared/confirm-dialog';
+import { ImageUploader } from '../../components/shared/image-uploader';
 import { Modal } from '../../components/shared/modal';
 import { SearchInput } from '../../components/shared/search-input';
 import { PaginationMeta } from '../../models/api-response';
@@ -25,6 +26,7 @@ import { GalleryService } from '../../services/gallery.service';
     Button,
     Modal,
     ConfirmDialog,
+    ImageUploader,
     SearchInput,
     LucidePlus,
     LucideAlertTriangle,
@@ -58,11 +60,11 @@ export class Gallery implements OnInit {
   protected deleting = signal(false);
 
   protected selectedImage: File | null = null;
-  protected imagePreview = signal<string | null>(null);
+  protected existingImageUrl = signal<string | null>(null);
 
   protected isFormValid(): boolean {
     const hasName = (this.form.name ?? '').trim().length > 0;
-    const hasImage = !!this.selectedImage || !!this.editingEvent()?.image_url;
+    const hasImage = !!this.selectedImage || !!this.existingImageUrl();
     return hasName && hasImage;
   }
 
@@ -121,7 +123,7 @@ export class Gallery implements OnInit {
     this.editingEvent.set(null);
     this.form = { name: '', description: '' };
     this.selectedImage = null;
-    this.imagePreview.set(null);
+    this.existingImageUrl.set(null);
     this.modalOpen.set(true);
   }
 
@@ -132,7 +134,7 @@ export class Gallery implements OnInit {
       description: photo.description || '',
     };
     this.selectedImage = null;
-    this.imagePreview.set(photo.image_url || null);
+    this.existingImageUrl.set(photo.image_url || null);
     this.modalOpen.set(true);
   }
 
@@ -142,12 +144,12 @@ export class Gallery implements OnInit {
 
   protected onImageChange(file: File | null): void {
     this.selectedImage = file;
-    if (file) {
-      this.imagePreview.set(URL.createObjectURL(file));
-    } else if (this.editingEvent()) {
-      this.imagePreview.set(this.editingEvent()!.image_url || null);
-    } else {
-      this.imagePreview.set(null);
+  }
+
+  protected onImageDelete(deleted: boolean): void {
+    if (deleted) {
+      this.existingImageUrl.set(null);
+      this.selectedImage = null;
     }
   }
 
@@ -160,8 +162,8 @@ export class Gallery implements OnInit {
     formData.append('description', this.form.description || '');
     if (this.selectedImage) {
       formData.append('image', this.selectedImage);
-    } else if (this.editingEvent() && this.editingEvent()!.image_url) {
-      formData.append('image_url', this.editingEvent()!.image_url);
+    } else if (this.editingEvent() && this.existingImageUrl()) {
+      formData.append('image_url', this.existingImageUrl()!);
     }
 
     const request = this.editingEvent()

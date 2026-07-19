@@ -6,4 +6,5 @@ export interface Promotion extends ProductPrice {
   productName: string;
   productPrice: string;
   productImage: string | null;
+  description?: string;
 }
