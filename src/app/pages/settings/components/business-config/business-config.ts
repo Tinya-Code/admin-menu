@@ -16,9 +16,10 @@ import {
   DAYS_OF_WEEK,
   MAX_DELIVERY_ZONES,
 } from '../../../../models/settings';
+import { FeaturesService } from '../../../../services/features.service';
 
-import { Time12Pipe } from '../../../../pipes/time-12.pipe';
 import { LucidePlus } from '@lucide/angular';
+import { Time12Pipe } from '../../../../pipes/time-12.pipe';
 
 @Component({
   selector: 'app-business-config',
@@ -52,6 +53,7 @@ export class BusinessConfig implements OnInit {
   isValid = output<boolean>();
 
   private readonly fb = inject(FormBuilder);
+  protected readonly featuresService = inject(FeaturesService);
   readonly daysOfWeek = DAYS_OF_WEEK;
   readonly dayNames = DAY_NAMES_ES;
   readonly maxDeliveryZones = MAX_DELIVERY_ZONES;

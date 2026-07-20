@@ -147,115 +147,117 @@
     </div>
   </div>
   <!-- Zonas de Delivery -->
-  <div
-    class="mb-8 bg-gray-50/50 rounded-2xl p-6 border border-gray-100 shadow-sm transition-all hover:bg-white hover:shadow-md hover:border-blue-100"
-  >
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <h3 class="text-lg font-semibold text-gray-900">Zonas de Delivery</h3>
-        <p class="text-xs text-gray-400 mt-1">Configura las áreas y costos de envío</p>
-      </div>
-      <button
-        type="button"
-        (click)="addDeliveryZone()"
-        [disabled]="!canAddMoreZones()"
-        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary-hover shadow-sm hover:shadow-md active:scale-95 disabled:bg-gray-300 disabled:shadow-none disabled:active:scale-100 transition-all"
-      >
-        <svg lucidePlus class="w-4 h-4"></svg>
-        <span>Agregar Zona</span>
-      </button>
-    </div>
-
-    <div formArrayName="delivery_zones" class="space-y-3">
-      @for (zone of deliveryZonesArray.controls; track $index; let i = $index) {
-        <div
-          class="group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
+  @if (featuresService.deliveryOptions) {
+    <div
+      class="mb-8 bg-gray-50/50 rounded-2xl p-6 border border-gray-100 shadow-sm transition-all hover:bg-white hover:shadow-md hover:border-blue-100"
+    >
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Zonas de Delivery</h3>
+          <p class="text-xs text-gray-400 mt-1">Configura las áreas y costos de envío</p>
+        </div>
+        <button
+          type="button"
+          (click)="addDeliveryZone()"
+          [disabled]="!canAddMoreZones()"
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary-hover shadow-sm hover:shadow-md active:scale-95 disabled:bg-gray-300 disabled:shadow-none disabled:active:scale-100 transition-all"
         >
-          <div [formGroupName]="i" class="flex flex-col md:flex-row gap-4">
-            <!-- Nombre de zona -->
-            <div class="flex-1">
-              <label
-                class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1"
-                >Nombre</label
-              >
-              <input
-                type="text"
-                formControlName="name"
-                class="w-full text-sm md:text-base px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all outline-none placeholder:text-gray-300"
-                placeholder="Ej: Zona Central"
-              />
-            </div>
+          <svg lucidePlus class="w-4 h-4"></svg>
+          <span>Agregar Zona</span>
+        </button>
+      </div>
 
-            <div class="flex items-end gap-3">
-              <!-- Precio -->
-              <div class="relative w-full md:w-36">
+      <div formArrayName="delivery_zones" class="space-y-3">
+        @for (zone of deliveryZonesArray.controls; track $index; let i = $index) {
+          <div
+            class="group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
+          >
+            <div [formGroupName]="i" class="flex flex-col md:flex-row gap-4">
+              <!-- Nombre de zona -->
+              <div class="flex-1">
                 <label
                   class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1"
-                  >Costo Envío</label
+                  >Nombre</label
                 >
-                <div class="relative">
-                  <span
-                    class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-bold"
-                    >S/</span
-                  >
-                  <input
-                    type="number"
-                    formControlName="fee"
-                    class="w-full pl-9 pr-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all outline-none text-sm md:text-base font-medium"
-                    placeholder="0.00"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
+                <input
+                  type="text"
+                  formControlName="name"
+                  class="w-full text-sm md:text-base px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all outline-none placeholder:text-gray-300"
+                  placeholder="Ej: Zona Central"
+                />
               </div>
 
-              <!-- Botón eliminar -->
-              <button
-                type="button"
-                (click)="removeDeliveryZone(i)"
-                class="p-2.5 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all border border-transparent hover:border-red-100 active:scale-90"
-                title="Eliminar zona"
-              >
-                <svg lucideTrash2 class="w-5 h-5"></svg>
-              </button>
+              <div class="flex items-end gap-3">
+                <!-- Precio -->
+                <div class="relative w-full md:w-36">
+                  <label
+                    class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1"
+                    >Costo Envío</label
+                  >
+                  <div class="relative">
+                    <span
+                      class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-bold"
+                      >S/</span
+                    >
+                    <input
+                      type="number"
+                      formControlName="fee"
+                      class="w-full pl-9 pr-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all outline-none text-sm md:text-base font-medium"
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+
+                <!-- Botón eliminar -->
+                <button
+                  type="button"
+                  (click)="removeDeliveryZone(i)"
+                  class="p-2.5 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all border border-transparent hover:border-red-100 active:scale-90"
+                  title="Eliminar zona"
+                >
+                  <svg lucideTrash2 class="w-5 h-5"></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Errors -->
+            <div class="flex flex-col gap-1 mt-2">
+              @if (getDeliveryZoneErrorMessage(i, 'name')) {
+                <div class="text-[11px] font-medium text-red-500 px-2 animate-in fade-in">
+                  {{ getDeliveryZoneErrorMessage(i, 'name') }}
+                </div>
+              }
+              @if (getDeliveryZoneErrorMessage(i, 'fee')) {
+                <div class="text-[11px] font-medium text-red-500 px-2 animate-in fade-in">
+                  {{ getDeliveryZoneErrorMessage(i, 'fee') }}
+                </div>
+              }
             </div>
           </div>
+        }
 
-          <!-- Errors -->
-          <div class="flex flex-col gap-1 mt-2">
-            @if (getDeliveryZoneErrorMessage(i, 'name')) {
-              <div class="text-[11px] font-medium text-red-500 px-2 animate-in fade-in">
-                {{ getDeliveryZoneErrorMessage(i, 'name') }}
-              </div>
-            }
-            @if (getDeliveryZoneErrorMessage(i, 'fee')) {
-              <div class="text-[11px] font-medium text-red-500 px-2 animate-in fade-in">
-                {{ getDeliveryZoneErrorMessage(i, 'fee') }}
-              </div>
-            }
-          </div>
+        <!-- List Messages -->
+        <div class="flex flex-col gap-2 mt-4 px-2">
+          @if (deliveryZonesCount() === 0) {
+            <div
+              class="flex flex-col items-center justify-center p-8 bg-gray-50/30 rounded-2xl border border-dashed border-gray-200"
+            >
+              <svg lucideMapPin class="w-8 h-8 text-gray-300 mb-2"></svg>
+              <p class="text-xs text-gray-400 font-medium">No hay zonas de delivery configuradas</p>
+            </div>
+          }
+          @if (!canAddMoreZones()) {
+            <div
+              class="inline-flex items-center gap-2 text-[11px] font-bold text-amber-600 bg-amber-50 px-3 py-2 rounded-lg border border-amber-100/50"
+            >
+              <svg lucideAlertCircle class="w-3.5 h-3.5"></svg>
+              Has alcanzado el máximo de {{ maxDeliveryZones }} zonas de delivery.
+            </div>
+          }
         </div>
-      }
-
-      <!-- List Messages -->
-      <div class="flex flex-col gap-2 mt-4 px-2">
-        @if (deliveryZonesCount() === 0) {
-          <div
-            class="flex flex-col items-center justify-center p-8 bg-gray-50/30 rounded-2xl border border-dashed border-gray-200"
-          >
-            <svg lucideMapPin class="w-8 h-8 text-gray-300 mb-2"></svg>
-            <p class="text-xs text-gray-400 font-medium">No hay zonas de delivery configuradas</p>
-          </div>
-        }
-        @if (!canAddMoreZones()) {
-          <div
-            class="inline-flex items-center gap-2 text-[11px] font-bold text-amber-600 bg-amber-50 px-3 py-2 rounded-lg border border-amber-100/50"
-          >
-            <svg lucideAlertCircle class="w-3.5 h-3.5"></svg>
-            Has alcanzado el máximo de {{ maxDeliveryZones }} zonas de delivery.
-          </div>
-        }
       </div>
     </div>
-  </div>
+  }
 </form>
