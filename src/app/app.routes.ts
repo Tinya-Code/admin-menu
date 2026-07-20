@@ -41,6 +41,18 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/gallery/gallery').then((m) => m.Gallery),
       },
       {
+        path: 'banners',
+        loadComponent: () => import('./pages/banners/banners').then((m) => m.Banners),
+      },
+      {
+        path: 'banners/new',
+        loadComponent: () => import('./pages/banner-form/banner-form').then((m) => m.BannerForm),
+      },
+      {
+        path: 'banners/:id',
+        loadComponent: () => import('./pages/banner-form/banner-form').then((m) => m.BannerForm),
+      },
+      {
         path: 'settings',
         loadComponent: () => import('./pages/settings/settings-page').then((m) => m.SettingsPage),
       },

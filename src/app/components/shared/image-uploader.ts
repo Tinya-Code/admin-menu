@@ -8,7 +8,7 @@ const MAX_SIZE = 5 * 1024 * 1024;
   standalone: true,
   template: `
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-2">Imagen del producto</label>
+     
 
       <input
         #fileInput

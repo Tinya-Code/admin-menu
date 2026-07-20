@@ -7,6 +7,7 @@ import {
   LucideDynamicIcon,
   LucideFolderTree,
   LucideHouse,
+  LucideImage,
   LucidePackage,
   LucideSettings,
   LucideX,
@@ -37,6 +38,7 @@ export class AppLayout {
     { label: 'Productos', path: '/products', icon: LucidePackage },
     { label: 'Combos', path: '/combos', icon: LucideBoxes },
     { label: 'Galería', path: '/gallery', icon: LucideCalendarDays },
+    { label: 'Banners', path: '/banners', icon: LucideImage },
     { label: 'Configuración', path: '/settings', icon: LucideSettings },
   ];
 
