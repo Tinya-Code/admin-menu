@@ -116,34 +116,43 @@ export class SettingsPage implements OnInit, OnDestroy {
 
     // Handle restaurant-config: flat structure with name, phone, address, location_lat, location_lng
     if (section === 'restaurant' && config.name !== undefined) {
-      const isDifferent =
-        settings.name !== config.name ||
-        settings.phone !== config.phone ||
-        settings.address !== config.address ||
-        settings.location_lat !== config.location_lat ||
-        settings.location_lng !== config.location_lng;
+      const nextRestaurantConfig = {
+        name: config.name ?? settings.name,
+        phone: config.phone ?? settings.phone,
+        address: config.address ?? settings.address,
+        location_lat: config.location_lat ?? settings.location_lat,
+        location_lng: config.location_lng ?? settings.location_lng,
+      };
+
+      const isDifferent = !this.isEqual(
+        {
+          name: settings.name,
+          phone: settings.phone,
+          address: settings.address,
+          location_lat: settings.location_lat,
+          location_lng: settings.location_lng,
+        },
+        nextRestaurantConfig,
+      );
 
       if (!isDifferent) return;
 
       this.currentSettings.set({
         ...settings,
-        name: config.name,
-        phone: config.phone,
-        address: config.address,
-        location_lat: config.location_lat,
-        location_lng: config.location_lng,
+        ...nextRestaurantConfig,
       });
       this.hasUnsavedChanges.set(true);
       return;
     }
 
-    const previous = (settings as any)[section];
-    const isDifferent = !this.isEqual(previous, config);
+    const previous = (settings as any)[section] ?? {};
+    const mergedSection = this.mergeConfigData(previous, config);
+    const isDifferent = !this.isEqual(previous, mergedSection);
 
     if (!isDifferent) return;
     this.currentSettings.set({
       ...settings,
-      [section]: config,
+      [section]: mergedSection,
     } as any);
     this.hasUnsavedChanges.set(true);
   }
@@ -297,6 +306,43 @@ export class SettingsPage implements OnInit, OnDestroy {
 
   isEqual(a: any, b: any): boolean {
     return JSON.stringify(this.sortObject(a)) === JSON.stringify(this.sortObject(b));
+  }
+
+  private mergeConfigData<T>(previousValue: T, incomingValue: Partial<T> | undefined | null): T {
+    if (incomingValue === undefined || incomingValue === null) {
+      return previousValue;
+    }
+
+    if (Array.isArray(previousValue) || Array.isArray(incomingValue)) {
+      return (Array.isArray(incomingValue) ? incomingValue : previousValue) as T;
+    }
+
+    if (this.isPlainObject(previousValue) && this.isPlainObject(incomingValue)) {
+      const result = { ...(previousValue as Record<string, unknown>) } as Record<string, unknown>;
+
+      Object.entries(incomingValue as Record<string, unknown>).forEach(([key, value]) => {
+        if (value === undefined) {
+          return;
+        }
+
+        const previousEntry = (previousValue as Record<string, unknown>)[key];
+        if (this.isPlainObject(previousEntry) && this.isPlainObject(value)) {
+          result[key] = this.mergeConfigData(previousEntry, value as Partial<Record<string, unknown>>);
+        } else if (Array.isArray(previousEntry) && Array.isArray(value)) {
+          result[key] = [...value];
+        } else {
+          result[key] = value;
+        }
+      });
+
+      return result as T;
+    }
+
+    return incomingValue as T;
+  }
+
+  private isPlainObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
   }
 
   sortObject(obj: any): any {

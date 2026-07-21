@@ -57,22 +57,22 @@
     </div>
 
     <!-- Ubicación en Mapa -->
-    <div class="mb-8">
+    <!-- <div class="mb-8">
       <div class="mb-6">
         <h3 class="text-lg font-semibold text-gray-900">Ubicación</h3>
         <p class="text-xs text-gray-400 mt-1">
           Selecciona la ubicación del restaurante en el mapa. Haz clic para mover el marcador.
         </p>
-      </div>
+      </div> -->
 
       <!-- Map Container -->
-      <app-map-picker
+      <!-- <app-map-picker
         [location]="restaurantForm.get('location')?.value"
         (locationChange)="onLocationChange($event)"
-      ></app-map-picker>
+      ></app-map-picker> -->
 
       <!-- Location Coordinates Display -->
-      <div class="mt-4 flex items-center gap-4 text-sm">
+      <!-- <div class="mt-4 flex items-center gap-4 text-sm">
         <div class="flex items-center gap-2">
           <svg lucideMapPin class="w-4 h-4 text-gray-400"></svg>
           <span class="text-gray-500">Lat:</span>
@@ -86,13 +86,13 @@
             {{ restaurantForm.get('location.lng')?.value?.toFixed(6) || '0.000000' }}
           </span>
         </div>
-      </div>
+      </div> -->
 
-      @if (getLocationErrorMessage()) {
+      <!-- @if (getLocationErrorMessage()) {
         <div class="mt-3 text-[11px] font-medium text-red-500 px-1 animate-in fade-in">
           {{ getLocationErrorMessage() }}
         </div>
-      }
-    </div>
+      } 
+    </div>-->
   </div>
 </form>

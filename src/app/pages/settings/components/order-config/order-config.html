@@ -11,7 +11,7 @@
             <p class="text-xs text-gray-500 mt-1">Permite recibir pedidos a través del sistema</p>
           </div>
           <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" formControlName="enabled" class="sr-only peer" />
+            <input type="checkbox" formControlName="delivery_enabled" class="sr-only peer" />
             <div
               class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
             ></div>
@@ -19,7 +19,7 @@
         </div>
       </div>
 
-      <div class="space-y-6" [class.opacity-50]="!isFormEnabled">
+      <div class="space-y-6 " [class.opacity-50]="!isFormEnabled">
         <!-- Cantidad Máxima de Platos -->
         <div class="form-group">
           <label for="max-order-quantity" class="block text-sm font-medium text-gray-700 mb-2">
@@ -53,66 +53,8 @@
             Número máximo de platos que un cliente puede ordenar en un solo pedido
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Métodos de Pago -->
-    <div class="form-group">
-      <label class="block text-sm font-medium text-gray-700 mb-2">
-        Métodos de Pago Aceptados
-      </label>
-      <div class="space-y-2">
-        <div class="grid grid-cols-2 gap-3">
-          @for (method of paymentMethods; track method) {
-            <div
-              class="flex items-center p-3 border rounded-lg cursor-pointer transition-all duration-150 hover:border-blue-500 hover:bg-blue-50"
-              [class.bg-blue-50]="isPaymentMethodSelected(method)"
-              [class.border-blue-300]="isPaymentMethodSelected(method)"
-              [class.bg-white]="!isPaymentMethodSelected(method)"
-              [class.border-gray-200]="!isPaymentMethodSelected(method)"
-              [class.opacity-50]="!isFormEnabled"
-              [class.pointer-events-none]="!isFormEnabled"
-              (click)="
-                !isFormEnabled || onPaymentMethodChange(method, !isPaymentMethodSelected(method))
-              "
-            >
-              <input
-                type="checkbox"
-                [checked]="isPaymentMethodSelected(method)"
-                (change)="onPaymentMethodChange(method, $event)"
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 accent-blue-600 disabled:accent-gray-500"
-              />
-              <label class="ml-2 text-sm font-medium text-gray-700 cursor-pointer">
-                {{ getPaymentMethodLabel(method) }}
-              </label>
-            </div>
-          }
-        </div>
-      </div>
-      <div class="mt-1 text-xs text-gray-500">Selecciona los métodos de pago que aceptas</div>
-    </div>
-    @if (featuresService.deliveryOptions) {
-      <!-- Opciones Adicionales -->
-      <div class="form-group">
-        <label class="block text-sm font-medium text-gray-700 mb-3"> Opciones Adicionales </label>
-        <div class="space-y-3 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Delivery -->
-          <div
-            class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
-          >
-            <div>
-              <div class="text-sm font-medium text-gray-900">Delivery Disponible</div>
-              <div class="text-xs text-gray-500">Ofrece servicio de delivery a domicilio</div>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" formControlName="delivery_enabled" class="sr-only peer" />
-              <div
-                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                [class.opacity-50]="!isFormEnabled"
-              ></div>
-            </label>
-          </div>
-          <!-- Costo de Delivery -->
+        <!-- Métodos de Pago -->
+        @if (featuresService.deliveryOptions) {
           <div class="form-group">
             <label for="delivery-fee" class="block text-sm font-medium text-gray-700 mb-2">
               Costo de Delivery
@@ -148,8 +90,8 @@
               Costo fijo de delivery para todos los pedidos
             </div>
           </div>
-        </div>
+        }
       </div>
-    }
+    </div>
   </div>
 </form>

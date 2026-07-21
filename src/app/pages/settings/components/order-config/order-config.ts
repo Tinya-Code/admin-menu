@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, input, OnInit, output } from '@angular/core';
+import { Component, inject, input, OnInit, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   OrderConfig as OrderConfigModel,
@@ -17,7 +17,7 @@ import { FeaturesService } from '../../../../services/features.service';
 })
 export class OrderConfig implements OnInit {
   config = input<OrderConfigModel>({
-    enabled: false,
+    enabled: true,
     max_order_quantity: 1,
     accepts_reservations: false,
     pickup_enabled: false,
@@ -30,12 +30,12 @@ export class OrderConfig implements OnInit {
   isValid = output<boolean>();
 
   readonly paymentMethods = PAYMENT_METHODS;
-  protected readonly featuresService = inject(FeaturesService);
 
   private fb = inject(FormBuilder);
+   protected readonly featuresService = inject(FeaturesService);
 
   orderForm: FormGroup = this.fb.group({
-    enabled: [false],
+    enabled: [true],
     max_order_quantity: [1, [Validators.required, Validators.min(1)]],
     accepts_reservations: [false],
     pickup_enabled: [false],
@@ -60,8 +60,9 @@ export class OrderConfig implements OnInit {
       this.updateDeliveryFeeDisabled();
     });
 
-    this.orderForm.valueChanges.subscribe((values) => {
+    this.orderForm.valueChanges.subscribe(() => {
       const isValid = this.orderForm.valid;
+      const values = this.orderForm.getRawValue();
       this.isValid.emit(isValid);
 
       // Always emit changes to enable the save button
@@ -79,7 +80,7 @@ export class OrderConfig implements OnInit {
   }
 
   get isFormEnabled(): boolean {
-    return this.orderForm.get('enabled')?.value;
+    return this.orderForm.get('delivery_enabled')?.value;
   }
 
   isPaymentMethodSelected(method: PaymentMethod): boolean {
