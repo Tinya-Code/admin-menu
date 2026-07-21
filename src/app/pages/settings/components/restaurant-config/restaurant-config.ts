@@ -2,13 +2,12 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { MapPicker } from '../../../../components/map-picker/map-picker';
 import { Location, RestaurantConfig as RestaurantConfigModel } from '../../../../models/settings';
 
 @Component({
   selector: 'app-restaurant-config',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MapPicker],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './restaurant-config.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -114,6 +113,7 @@ export class RestaurantConfig implements OnInit {
     return '';
   }
 
+  /**
   getLocationErrorMessage(): string {
     const latControl = this.restaurantForm.get('location.lat');
     const lngControl = this.restaurantForm.get('location.lng');
@@ -132,4 +132,5 @@ export class RestaurantConfig implements OnInit {
 
     return '';
   }
+  */
 }
