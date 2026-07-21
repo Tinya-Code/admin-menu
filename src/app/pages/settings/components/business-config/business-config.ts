@@ -89,8 +89,9 @@ export class BusinessConfig implements OnInit {
   }
 
   private setupFormListeners(): void {
-    this.businessForm.valueChanges.subscribe((values) => {
+    this.businessForm.valueChanges.subscribe(() => {
       const isValid = this.businessForm.valid;
+      const values = this.businessForm.getRawValue();
       this.isValid.emit(isValid);
 
       // Always emit changes to enable the save button

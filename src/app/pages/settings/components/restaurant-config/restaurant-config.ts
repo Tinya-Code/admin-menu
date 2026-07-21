@@ -54,8 +54,9 @@ export class RestaurantConfig implements OnInit {
   }
 
   private setupFormListeners(): void {
-    this.restaurantForm.valueChanges.subscribe((values) => {
+    this.restaurantForm.valueChanges.subscribe(() => {
       const isValid = this.restaurantForm.valid;
+      const values = this.restaurantForm.getRawValue();
       this.isValid.emit(isValid);
 
       // Always emit changes to enable the save button

@@ -7,6 +7,7 @@ import {
   PAYMENT_METHODS,
   PaymentMethod,
 } from '../../../../models/settings';
+import { FeaturesService } from '../../../../services/features.service';
 
 @Component({
   selector: 'app-order-config',
@@ -31,6 +32,7 @@ export class OrderConfig implements OnInit {
   readonly paymentMethods = PAYMENT_METHODS;
 
   private fb = inject(FormBuilder);
+   protected readonly featuresService = inject(FeaturesService);
 
   orderForm: FormGroup = this.fb.group({
     enabled: [true],
@@ -58,8 +60,9 @@ export class OrderConfig implements OnInit {
       this.updateDeliveryFeeDisabled();
     });
 
-    this.orderForm.valueChanges.subscribe((values) => {
+    this.orderForm.valueChanges.subscribe(() => {
       const isValid = this.orderForm.valid;
+      const values = this.orderForm.getRawValue();
       this.isValid.emit(isValid);
 
       // Always emit changes to enable the save button

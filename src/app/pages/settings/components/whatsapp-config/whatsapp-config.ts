@@ -49,8 +49,9 @@ export class WhatsAppConfig implements OnInit {
   }
 
   private setupFormListeners(): void {
-    this.whatsappForm.valueChanges.subscribe((values) => {
+    this.whatsappForm.valueChanges.subscribe(() => {
       const isValid = this.whatsappForm.valid;
+      const values = this.whatsappForm.getRawValue();
       this.isValid.emit(isValid);
 
       // Always emit changes to enable the save button
