@@ -33,9 +33,9 @@
       }
     </div>
   } @else if (stats().length > 0) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-6">
       @for (stat of stats(); track stat.label) {
-        <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div class="bg-white rounded-xl border border-gray-200 p-4 md:p-6 hover:shadow-md transition-shadow">
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center" [class]="stat.bgColor + ' ' + stat.color">
               <svg [lucideIcon]="stat.icon" class="w-6 h-6"></svg>
