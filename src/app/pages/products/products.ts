@@ -9,6 +9,7 @@ import { PaginationMeta } from '../../models/api-response';
 import { Button } from '../../components/shared/button';
 import { ConfirmDialog } from '../../components/shared/confirm-dialog';
 import { SearchInput } from '../../components/shared/search-input';
+import { FilterSelect, FilterOption } from '../../components/shared/filter-select';
 import {
   LucidePlus,
   LucideTriangleAlert,
@@ -24,7 +25,7 @@ import {
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [Button, ConfirmDialog, SearchInput, LucidePlus, LucideTriangleAlert, LucidePackage, LucideImage, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight, LucideStar],
+  imports: [Button, ConfirmDialog, SearchInput, FilterSelect, LucidePlus, LucideTriangleAlert, LucidePackage, LucideImage, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight, LucideStar],
   templateUrl: './products.html',
 })
 export class Products implements OnInit {
@@ -39,6 +40,7 @@ export class Products implements OnInit {
   protected loading = signal(true);
   protected apiError = signal<string | null>(null);
   protected searchTerm = signal('');
+  protected selectedCategory = signal('');
   protected currentPage = signal(1);
   protected readonly pageSize = 10;
 
@@ -66,7 +68,7 @@ export class Products implements OnInit {
   }
 
   private loadProducts(): void {
-    this.productService.getPaginated(this.currentPage(), this.pageSize, this.searchTerm()).subscribe({
+    this.productService.getPaginated(this.currentPage(), this.pageSize, this.searchTerm(), this.selectedCategory()).subscribe({
       next: (res) => {
         this.products.set(res.data);
         this.meta.set(res.meta);
@@ -83,6 +85,20 @@ export class Products implements OnInit {
     this.searchTerm.set(term);
     this.currentPage.set(1);
     this.loadProducts();
+  }
+
+  protected onCategoryChange(categoryId: string): void {
+    this.selectedCategory.set(categoryId);
+    this.currentPage.set(1);
+    this.loadProducts();
+  }
+
+  protected categoryOptions(): FilterOption[] {
+    const cats = this.categories();
+    return [
+      { value: '', label: 'Todas las categorías' },
+      ...cats.map((c) => ({ value: c.id, label: c.name })),
+    ];
   }
 
   protected goToPage(page: number): void {
