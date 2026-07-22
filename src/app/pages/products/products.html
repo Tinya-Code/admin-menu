@@ -11,13 +11,23 @@
     </app-button>
   </div>
 
-  <!-- Search -->
-  <div class="mb-6 w-full md:max-w-xs">
-    <app-search-input
-      [searchTerm]="searchTerm()"
-      placeholder="Buscar productos..."
-      (onSearch)="onSearch($event)"
-    />
+  <!-- Search & Filter -->
+  <div class="mb-6 flex flex-col sm:flex-row gap-3 w-full">
+    <div class="flex-1">
+      <app-search-input
+        [searchTerm]="searchTerm()"
+        placeholder="Buscar productos..."
+        (onSearch)="onSearch($event)"
+      />
+    </div>
+    <div class="w-full sm:w-56">
+      <app-filter-select
+        placeholder="Categoría"
+        [options]="categoryOptions()"
+        [selectedValue]="selectedCategory()"
+        (onFilter)="onCategoryChange($event)"
+      />
+    </div>
   </div>
 
   <!-- Error -->

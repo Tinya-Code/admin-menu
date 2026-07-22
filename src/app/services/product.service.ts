@@ -85,11 +85,12 @@ export class ProductService {
     return this.http.get<any>(this.apiUrl).pipe(map((res) => (res.data ?? res).map(defaultsProduct)));
   }
 
-  getPaginated(page = 1, limit = 10, search = ''): Observable<{ data: Product[]; meta: PaginationMeta }> {
+  getPaginated(page = 1, limit = 10, search = '', category = ''): Observable<{ data: Product[]; meta: PaginationMeta }> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
     if (search) params = params.set('search', search);
+    if (category) params = params.set('category', category);
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map((res) => ({
         data: (res.data ?? []).map(defaultsProduct),

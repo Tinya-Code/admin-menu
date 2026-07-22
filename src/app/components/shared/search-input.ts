@@ -1,6 +1,6 @@
-import { Component, input, output, model, OnDestroy, OnInit } from '@angular/core';
+import { Component, input, model, OnDestroy, OnInit, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-search-input',
