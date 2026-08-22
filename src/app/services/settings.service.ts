@@ -54,17 +54,36 @@ export class SettingsService {
    * Actualizar configuración (Upsert / Partial Update)
    */
   updateBusinessSettings(data: Partial<BusinessSettings> | any): Observable<BusinessSettings> {
-    const apiPayload = this.mapUiToApi(data);
-
-    // Si el payload está vacío (no hay nada que actualizar), devolvemos un observable exitoso "vacío"
-    if (Object.keys(apiPayload).length === 0) {
-      return this.getBusinessSettings();
+    const originalCache = this._cache();
+    if (!originalCache) {
+      // Si no hay caché, enviamos todo como viene, mapeado a API
+      const apiPayload = this.mapUiToApi(data);
+      return this.executePut(apiPayload);
     }
 
+    // Convertimos ambos al formato de API para compararlos fácilmente
+    const originalApi = this.mapUiToApi(originalCache);
+    const updatedApi = this.mapUiToApi(data);
+
+    // Calculamos el diff
+    const apiPayload = this.calculateDiff(originalApi, updatedApi);
+
+    // Si el payload está vacío (no hay nada que actualizar), devolvemos un observable exitoso
+    if (Object.keys(apiPayload).length === 0) {
+      return of(originalCache);
+    }
+
+    return this.executePut(apiPayload);
+  }
+
+  private executePut(apiPayload: any): Observable<BusinessSettings> {
     return this.http.put<ApiResponse<SettingsResponse>>(this.apiUrl, apiPayload).pipe(
       map((response) => {
         if (response?.data) {
-          return this.mapApiToUi(response.data);
+          const mapped = this.mapApiToUi(response.data);
+          this._cache.set(mapped);
+          this._lastFetchTime.set(Date.now());
+          return mapped;
         }
         return response as any;
       }),
@@ -73,6 +92,47 @@ export class SettingsService {
         return throwError(() => error);
       }),
     );
+  }
+
+  /**
+   * Calcula las diferencias entre el objeto original y el actualizado.
+   * Si un valor ha sido vaciado o eliminado, devuelve `null` en lugar de `undefined`,
+   * cumpliendo con la regla de backend para eliminar llaves en el deepMerge.
+   */
+  private calculateDiff(original: any, updated: any): any {
+    const diff: any = {};
+
+    const keys = new Set([...Object.keys(original || {}), ...Object.keys(updated || {})]);
+
+    for (const key of keys) {
+      const origVal = original ? original[key] : undefined;
+      let upVal = updated ? updated[key] : undefined;
+
+      // Tratar cadenas vacías como null para limpiar en base de datos
+      if (upVal === '') upVal = null;
+      const normalizedOrig = origVal === '' ? null : origVal;
+
+      if (Array.isArray(normalizedOrig) || Array.isArray(upVal)) {
+        if (JSON.stringify(normalizedOrig) !== JSON.stringify(upVal)) {
+          diff[key] = upVal ?? null;
+        }
+      } else if (
+        typeof normalizedOrig === 'object' && normalizedOrig !== null &&
+        typeof upVal === 'object' && upVal !== null
+      ) {
+        const nestedDiff = this.calculateDiff(normalizedOrig, upVal);
+        if (Object.keys(nestedDiff).length > 0) {
+          diff[key] = nestedDiff;
+        }
+      } else {
+        if (normalizedOrig !== upVal) {
+          // Si el nuevo valor es undefined, asumimos que se quería borrar (null)
+          diff[key] = upVal === undefined ? null : upVal;
+        }
+      }
+    }
+
+    return diff;
   }
 
   /**
@@ -147,85 +207,73 @@ export class SettingsService {
 
   /**
    * Mapear datos de la UI al formato de la API
-   * Envía estructura plana con campos del restaurant + configs
+   * Convierte todos los undefined a null y da el formato de campos requeridos (como teléfonos).
    */
   private mapUiToApi(data: Partial<BusinessSettings> | any): any {
     const apiData: any = {};
 
+    const formatPhone = (phone: string | undefined | null) => {
+      if (!phone) return null;
+      return phone.startsWith('+51') ? phone : `+51${phone}`;
+    };
+
+    const getVal = (val: any) => val === undefined || val === '' ? null : val;
+
     // Mapear campos del restaurant
-    if (data.name !== undefined) apiData.name = data.name;
-    if (data.phone !== undefined) {
-      const phone = data.phone || '';
-      apiData.phone = phone.startsWith('+51') ? phone : `+51${phone}`;
-    }
-    if (data.address !== undefined) apiData.address = data.address;
-    if (data.location_lat !== undefined) apiData.location_lat = data.location_lat;
-    if (data.location_lng !== undefined) apiData.location_lng = data.location_lng;
-    if (data.is_active !== undefined) apiData.is_active = data.is_active;
+    apiData.name = getVal(data.name);
+    apiData.phone = formatPhone(data.phone);
+    apiData.address = getVal(data.address);
+    apiData.location_lat = getVal(data.location_lat);
+    apiData.location_lng = getVal(data.location_lng);
+    apiData.is_active = getVal(data.is_active);
 
     // Mapear whatsapp_config
     if (data.whatsapp_config) {
       apiData.whatsapp_config = {
-        enabled: data.whatsapp_config.enabled,
-        number: data.whatsapp_config.number?.startsWith('+51')
-          ? data.whatsapp_config.number
-          : `+51${data.whatsapp_config.number}`,
-        message_template: data.whatsapp_config.message_template,
-        show_prices: data.whatsapp_config.show_prices,
-        greeting: data.whatsapp_config.greeting,
-        auto_include_restaurant_name: data.whatsapp_config.auto_include_restaurant_name,
+        enabled: getVal(data.whatsapp_config.enabled),
+        number: formatPhone(data.whatsapp_config.number),
+        message_template: getVal(data.whatsapp_config.message_template),
+        show_prices: getVal(data.whatsapp_config.show_prices),
+        greeting: getVal(data.whatsapp_config.greeting),
+        auto_include_restaurant_name: getVal(data.whatsapp_config.auto_include_restaurant_name),
       };
-
-      // Limpiar campos undefined
-      Object.keys(apiData.whatsapp_config).forEach((key) => {
-        if (apiData.whatsapp_config[key] === undefined) {
-          delete apiData.whatsapp_config[key];
-        }
-      });
     }
 
     // Mapear business_config
     if (data.business_config) {
       apiData.business_config = {
-        business_hours: data.business_config.business_hours,
-        timezone: data.business_config.timezone,
-        delivery_zones: data.business_config.delivery_zones,
-        social_media: data.business_config.social_media,
+        business_hours: getVal(data.business_config.business_hours),
+        timezone: getVal(data.business_config.timezone),
+        delivery_zones: getVal(data.business_config.delivery_zones),
+        social_media: getVal(data.business_config.social_media),
       };
     }
 
     // Mapear order_config
     if (data.order_config) {
       apiData.order_config = {
-        enabled: data.order_config.enabled,
-        max_order_quantity: data.order_config.max_order_quantity,
-        delivery_fee: data.order_config.delivery_fee,
-        payment_methods: data.order_config.payment_methods,
-        accepts_reservations: data.order_config.accepts_reservations,
-        delivery_enabled: data.order_config.delivery_enabled,
-        pickup_enabled: data.order_config.pickup_enabled,
+        enabled: getVal(data.order_config.enabled),
+        max_order_quantity: getVal(data.order_config.max_order_quantity),
+        delivery_fee: getVal(data.order_config.delivery_fee),
+        payment_methods: getVal(data.order_config.payment_methods),
+        accepts_reservations: getVal(data.order_config.accepts_reservations),
+        delivery_enabled: getVal(data.order_config.delivery_enabled),
+        pickup_enabled: getVal(data.order_config.pickup_enabled),
       };
-
-      // Limpiar campos undefined
-      Object.keys(apiData.order_config).forEach((key) => {
-        if (apiData.order_config[key] === undefined) {
-          delete apiData.order_config[key];
-        }
-      });
     }
 
     // Mapear display_config
     if (data.display_config) {
       apiData.display_config = {
-        show_images: data.display_config.show_images,
-        show_descriptions: data.display_config.show_descriptions,
-        show_categories: data.display_config.show_categories,
-        currency: data.display_config.currency,
-        currency_symbol: data.display_config.currency_symbol,
-        theme: data.display_config.theme,
-        colors: data.display_config.colors,
-        language: data.display_config.language,
-        show_availability_badge: data.display_config.show_availability_badge,
+        show_images: getVal(data.display_config.show_images),
+        show_descriptions: getVal(data.display_config.show_descriptions),
+        show_categories: getVal(data.display_config.show_categories),
+        currency: getVal(data.display_config.currency),
+        currency_symbol: getVal(data.display_config.currency_symbol),
+        theme: getVal(data.display_config.theme),
+        colors: getVal(data.display_config.colors),
+        language: getVal(data.display_config.language),
+        show_availability_badge: getVal(data.display_config.show_availability_badge),
       };
     }
 
