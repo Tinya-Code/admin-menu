@@ -7,10 +7,10 @@ import { PaginationMeta } from '../../models/api-response';
 import { Button } from '../../components/shared/button';
 import { ConfirmDialog } from '../../components/shared/confirm-dialog';
 import { SearchInput } from '../../components/shared/search-input';
+import { Table, TableColumn } from '../../components/shared/table';
 import {
   LucidePlus,
   LucideTriangleAlert,
-  LucideImage,
   LucidePencil,
   LucideTrash2,
   LucideChevronLeft,
@@ -22,7 +22,7 @@ import {
 @Component({
   selector: 'app-banners',
   standalone: true,
-  imports: [Button, ConfirmDialog, SearchInput, LucidePlus, LucideTriangleAlert, LucideImage, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight, LucideToggleLeft, LucideToggleRight],
+  imports: [Button, ConfirmDialog, SearchInput, Table, LucidePlus, LucideTriangleAlert, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight, LucideToggleLeft, LucideToggleRight],
   templateUrl: './banners.html',
 })
 export class Banners implements OnInit {
@@ -37,6 +37,15 @@ export class Banners implements OnInit {
   protected searchTerm = signal('');
   protected currentPage = signal(1);
   protected readonly pageSize = 10;
+
+  protected columns: TableColumn[] = [
+    { key: 'image', header: 'Banner', width: '80px' },
+    { key: 'title', header: 'Título' },
+    { key: 'status', header: 'Estado', width: '100px' },
+    { key: 'actions', header: 'Acciones', align: 'center', width: '140px' },
+  ];
+
+  protected rowKey = (row: Banner) => row.id;
 
   protected deleteDialogOpen = signal(false);
   protected deletingId = signal<string | null>(null);

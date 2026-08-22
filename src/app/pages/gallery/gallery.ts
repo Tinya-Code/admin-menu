@@ -4,7 +4,6 @@ import {
   LucideAlertTriangle,
   LucideChevronLeft,
   LucideChevronRight,
-  LucideInbox,
   LucidePencil,
   LucidePlus,
   LucideTrash2,
@@ -14,6 +13,7 @@ import { ConfirmDialog } from '../../components/shared/confirm-dialog';
 import { ImageUploader } from '../../components/shared/image-uploader';
 import { Modal } from '../../components/shared/modal';
 import { SearchInput } from '../../components/shared/search-input';
+import { Table, TableColumn } from '../../components/shared/table';
 import { PaginationMeta } from '../../models/api-response';
 import { GalleryForm, Gallery as GalleryModel } from '../../models/gallery';
 import { GalleryService } from '../../services/gallery.service';
@@ -28,9 +28,9 @@ import { GalleryService } from '../../services/gallery.service';
     ConfirmDialog,
     ImageUploader,
     SearchInput,
+    Table,
     LucidePlus,
     LucideAlertTriangle,
-    LucideInbox,
     LucidePencil,
     LucideTrash2,
     LucideChevronLeft,
@@ -49,6 +49,15 @@ export class Gallery implements OnInit {
   protected currentPage = signal(1);
   protected pageSize = signal(10);
   protected meta = signal<PaginationMeta | null>(null);
+
+  protected columns: TableColumn[] = [
+    { key: 'image', header: 'Imagen', width: '80px' },
+    { key: 'name', header: 'Nombre' },
+    { key: 'description', header: 'Descripción' },
+    { key: 'actions', header: 'Acciones', align: 'center', width: '120px' },
+  ];
+
+  protected rowKey = (row: GalleryModel) => row.id;
 
   protected modalOpen = signal(false);
   protected editingEvent = signal<GalleryModel | null>(null);

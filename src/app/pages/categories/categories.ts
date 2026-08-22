@@ -7,10 +7,10 @@ import { Button } from '../../components/shared/button';
 import { Modal } from '../../components/shared/modal';
 import { ConfirmDialog } from '../../components/shared/confirm-dialog';
 import { SearchInput } from '../../components/shared/search-input';
+import { Table, TableColumn } from '../../components/shared/table';
 import {
   LucidePlus,
   LucideAlertTriangle,
-  LucideInbox,
   LucidePencil,
   LucideTrash2,
   LucideChevronLeft,
@@ -20,7 +20,7 @@ import {
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [FormsModule, Button, Modal, ConfirmDialog, SearchInput, LucidePlus, LucideAlertTriangle, LucideInbox, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight],
+  imports: [FormsModule, Button, Modal, ConfirmDialog, SearchInput, Table, LucidePlus, LucideAlertTriangle, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight],
   templateUrl: './categories.html',
 })
 export class Categories implements OnInit {
@@ -33,6 +33,15 @@ export class Categories implements OnInit {
   protected searchTerm = signal('');
   protected currentPage = signal(1);
   protected readonly pageSize = 10;
+
+  protected columns: TableColumn[] = [
+    { key: 'name', header: 'Nombre' },
+    { key: 'description', header: 'Descripción' },
+    { key: 'block', header: 'Bloque', align: 'center' },
+    { key: 'actions', header: 'Acciones', align: 'center', width: '120px' },
+  ];
+
+  protected rowKey = (row: Category) => row.id;
 
   protected modalOpen = signal(false);
   protected editingCategory = signal<Category | null>(null);
