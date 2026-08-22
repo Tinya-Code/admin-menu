@@ -10,11 +10,10 @@ import { Button } from '../../components/shared/button';
 import { ConfirmDialog } from '../../components/shared/confirm-dialog';
 import { SearchInput } from '../../components/shared/search-input';
 import { FilterSelect, FilterOption } from '../../components/shared/filter-select';
+import { Table, TableColumn } from '../../components/shared/table';
 import {
   LucidePlus,
   LucideTriangleAlert,
-  LucidePackage,
-  LucideImage,
   LucidePencil,
   LucideTrash2,
   LucideChevronLeft,
@@ -25,7 +24,7 @@ import {
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [Button, ConfirmDialog, SearchInput, FilterSelect, LucidePlus, LucideTriangleAlert, LucidePackage, LucideImage, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight, LucideStar],
+  imports: [Button, ConfirmDialog, SearchInput, FilterSelect, Table, LucidePlus, LucideTriangleAlert, LucidePencil, LucideTrash2, LucideChevronLeft, LucideChevronRight, LucideStar],
   templateUrl: './products.html',
 })
 export class Products implements OnInit {
@@ -43,6 +42,16 @@ export class Products implements OnInit {
   protected selectedCategory = signal('');
   protected currentPage = signal(1);
   protected readonly pageSize = 10;
+
+  protected columns: TableColumn[] = [
+    { key: 'image', header: 'Producto', width: '80px' },
+    { key: 'category', header: 'Categoría' },
+    { key: 'price', header: 'Precio base', align: 'right', width: '120px' },
+    { key: 'status', header: 'Estado', width: '100px' },
+    { key: 'actions', header: 'Acciones', align: 'center', width: '120px' },
+  ];
+
+  protected rowKey = (row: Product) => row.id;
 
   protected deleteDialogOpen = signal(false);
   protected deletingId = signal<number | null>(null);

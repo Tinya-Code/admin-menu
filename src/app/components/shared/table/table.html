@@ -1,0 +1,116 @@
+@if (loading()) {
+  <div class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+    @for (placeholder of [1, 2, 3]; track placeholder) {
+      <div class="p-4 animate-pulse flex items-center gap-4">
+        <div class="flex-1 space-y-2">
+          <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+          <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+        </div>
+        <div class="flex gap-2">
+          <div class="w-8 h-8 bg-gray-200 rounded-lg"></div>
+          <div class="w-8 h-8 bg-gray-200 rounded-lg"></div>
+        </div>
+      </div>
+    }
+  </div>
+} @else if (data().length === 0) {
+  <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
+    <svg lucideInbox class="w-12 h-12 mx-auto text-gray-300 mb-4"></svg>
+    <p class="text-gray-500 font-medium">{{ emptyTitle() }}</p>
+    <p class="text-sm text-gray-400 mt-1">{{ emptySubtitle() }}</p>
+  </div>
+} @else {
+  <!-- Desktop table -->
+  <div class="hidden sm:block bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <table class="w-full">
+      <thead>
+        <tr class="bg-gray-50 border-b border-gray-200">
+          @for (col of columns(); track col.key) {
+            <th
+              class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider"
+              [class.text-left]="col.align !== 'center' && col.align !== 'right'"
+              [class.text-center]="col.align === 'center'"
+              [class.text-right]="col.align === 'right'"
+              [style.width]="col.width"
+            >
+              {{ col.header }}
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        @for (row of data(); track rowKey()(row)) {
+          <tr class="hover:bg-gray-50 transition-colors">
+            @for (col of columns(); track col.key) {
+              <td
+                class="px-6 py-4"
+                [class.text-center]="col.align === 'center'"
+                [class.text-right]="col.align === 'right'"
+              >
+                @if (col.key === 'image') {
+                  @if (getImageUrl(row)) {
+                    <button
+                      class="block w-12 h-12 rounded-lg overflow-hidden border border-gray-200 hover:border-[var(--color-primary)] transition-colors cursor-pointer"
+                      (click)="openImagePreview(getImageUrl(row)!, getRowName(row))"
+                      title="Ver imagen"
+                    >
+                      <img [src]="getImageUrl(row)" [alt]="getRowName(row)" class="w-full h-full object-cover" />
+                    </button>
+                  } @else {
+                    <div class="w-12 h-12 rounded-lg border border-dashed border-gray-300 flex items-center justify-center bg-gray-50">
+                      <svg lucideImage class="w-5 h-5 text-gray-300"></svg>
+                    </div>
+                  }
+                } @else {
+                  <ng-container
+                    *ngTemplateOutlet="cellTemplate(); context: { $implicit: row, column: col }"
+                  />
+                }
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile cards -->
+  @if (mobileCardTemplate()) {
+    <div class="sm:hidden space-y-3">
+      @for (row of data(); track rowKey()(row)) {
+        <div class="bg-white rounded-xl border border-gray-200 p-4">
+          <div class="flex items-start gap-3">
+            @if (hasImageColumn) {
+              @if (getImageUrl(row)) {
+                <button
+                  class="shrink-0 w-14 h-14 rounded-lg overflow-hidden border border-gray-200 hover:border-[var(--color-primary)] transition-colors cursor-pointer"
+                  (click)="openImagePreview(getImageUrl(row)!, getRowName(row))"
+                  title="Ver imagen"
+                >
+                  <img [src]="getImageUrl(row)" [alt]="getRowName(row)" class="w-full h-full object-cover" />
+                </button>
+              }
+            }
+            <ng-container
+              *ngTemplateOutlet="mobileCardTemplate()!; context: { $implicit: row }"
+            />
+          </div>
+        </div>
+      }
+    </div>
+  }
+}
+
+<!-- Image Preview Modal -->
+@if (hasImageColumn) {
+  <app-modal
+    [open]="imagePreviewOpen()"
+    [title]="imagePreviewName()"
+    size="lg"
+    (onClose)="closeImagePreview()"
+  >
+    <div class="flex items-center justify-center">
+      <img [src]="imagePreviewUrl()" alt="Vista previa" class="max-w-full max-h-[70vh] rounded-lg object-contain" />
+    </div>
+  </app-modal>
+}
