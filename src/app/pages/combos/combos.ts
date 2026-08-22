@@ -7,10 +7,10 @@ import { Modal } from '../../components/shared/modal';
 import { ConfirmDialog } from '../../components/shared/confirm-dialog';
 import { SearchInput } from '../../components/shared/search-input';
 import { ImageUploader } from '../../components/shared/image-uploader';
+import { Table, TableColumn } from '../../components/shared/table';
 import {
   LucidePlus,
   LucideAlertTriangle,
-  LucideInbox,
   LucidePencil,
   LucideTrash2,
 } from '@lucide/angular';
@@ -18,7 +18,7 @@ import {
 @Component({
   selector: 'app-combos',
   standalone: true,
-  imports: [FormsModule, Button, Modal, ConfirmDialog, SearchInput, ImageUploader, LucidePlus, LucideAlertTriangle, LucideInbox, LucidePencil, LucideTrash2],
+  imports: [FormsModule, Button, Modal, ConfirmDialog, SearchInput, ImageUploader, Table, LucidePlus, LucideAlertTriangle, LucidePencil, LucideTrash2],
   templateUrl: './combos.html',
 })
 export class Combos implements OnInit {
@@ -29,6 +29,16 @@ export class Combos implements OnInit {
   protected loading = signal(true);
   protected apiError = signal<string | null>(null);
   protected searchTerm = signal('');
+
+  protected columns: TableColumn[] = [
+    { key: 'image', header: 'Imagen', width: '80px' },
+    { key: 'name', header: 'Nombre' },
+    { key: 'description', header: 'Descripción' },
+    { key: 'price', header: 'Precio', align: 'center', width: '120px' },
+    { key: 'actions', header: 'Acciones', align: 'center', width: '120px' },
+  ];
+
+  protected rowKey = (row: Combo) => row.id;
 
   protected modalOpen = signal(false);
   protected editingCombo = signal<Combo | null>(null);
