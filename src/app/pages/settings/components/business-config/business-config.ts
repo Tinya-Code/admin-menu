@@ -7,6 +7,7 @@ import {
   input,
   OnInit,
   output,
+  signal,
 } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
@@ -18,15 +19,15 @@ import {
 } from '../../../../models/settings';
 import { FeaturesService } from '../../../../services/features.service';
 
-import { LucidePlus } from '@lucide/angular';
+import { LucidePlus, LucideTrash2, LucideAlertCircle } from '@lucide/angular';
 import { Time12Pipe } from '../../../../pipes/time-12.pipe';
 
 @Component({
   selector: 'app-business-config',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Time12Pipe, LucidePlus],
+  imports: [CommonModule, ReactiveFormsModule, Time12Pipe, LucidePlus, LucideTrash2, LucideAlertCircle],
   templateUrl: './business-config.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class BusinessConfig implements OnInit {
   config = input<BusinessConfigModel>({
@@ -63,13 +64,14 @@ export class BusinessConfig implements OnInit {
   businessForm = this.createBusinessForm();
 
   deliveryZonesCount = computed(() => this.deliveryZonesArray.length);
-  canAddMoreZones = computed(() => this.deliveryZonesArray.length < this.maxDeliveryZones);
+  canAddMoreZones = signal(true);
   isFormValid = computed(() => this.businessForm.valid);
 
   ngOnInit(): void {
     this.initializeBusinessHours();
     this.setupFormListeners();
     this.patchInitialValues();
+    this.updateCanAddMoreZones();
   }
 
   private createBusinessForm(): FormGroup {
@@ -97,6 +99,27 @@ export class BusinessConfig implements OnInit {
       // Always emit changes to enable the save button
       this.configChange.emit({ ...this.config(), ...values } as BusinessConfigModel);
     });
+
+    // Agregar listener al FormArray para actualizar la validación
+    this.deliveryZonesArray.valueChanges.subscribe(() => {
+      this.updateCanAddMoreZones();
+    });
+  }
+
+  private updateCanAddMoreZones(): void {
+    const hasCapacity = this.deliveryZonesArray.length < this.maxDeliveryZones;
+    
+    // Verificar que todas las zonas tengan valores válidos
+    const allZonesComplete = this.deliveryZonesArray.controls.every(
+      (control) => {
+        const name = control.get('name')?.value;
+        const fee = control.get('fee')?.value;
+        // Verificar que name no esté vacío y fee sea un número válido
+        return name && name.trim() !== '' && fee !== null && fee !== undefined && fee >= 0;
+      }
+    );
+    
+    this.canAddMoreZones.set(hasCapacity && allZonesComplete);
   }
 
   private patchInitialValues(): void {
@@ -182,18 +205,39 @@ export class BusinessConfig implements OnInit {
   }
 
   addDeliveryZone(name = '', fee = 0): void {
-    if (this.canAddMoreZones()) {
-      this.deliveryZonesArray.push(
-        this.fb.group({
-          name: [name, Validators.required],
-          fee: [fee, [Validators.required, Validators.min(0)]],
-        }),
-      );
-    }
+    // Verificar si se puede agregar antes de proceder
+    if (!this.canAddMoreZones()) return;
+
+    const hasCapacity = this.deliveryZonesArray.length < this.maxDeliveryZones;
+    if (!hasCapacity) return;
+
+    const newZone = this.fb.group({
+      name: [name, Validators.required],
+      fee: [fee, [Validators.required, Validators.min(0)]],
+    });
+
+    // Agregar listeners a los controles individuales para actualizar la validación
+    newZone.get('name')?.valueChanges.subscribe(() => {
+      this.updateCanAddMoreZones();
+    });
+    newZone.get('fee')?.valueChanges.subscribe(() => {
+      this.updateCanAddMoreZones();
+    });
+
+    this.deliveryZonesArray.push(newZone);
+
+    // Marcar los controles como touched y dirty para que la validación se active inmediatamente
+    newZone.markAllAsTouched();
+    newZone.markAsDirty();
+
+    // Forzar actualización del form y de la validación
+    this.businessForm.updateValueAndValidity();
+    this.updateCanAddMoreZones();
   }
 
   removeDeliveryZone(index: number): void {
     this.deliveryZonesArray.removeAt(index);
+    this.updateCanAddMoreZones();
   }
 
   getDayName(day: DayOfWeek): string {
