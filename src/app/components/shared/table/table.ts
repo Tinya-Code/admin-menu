@@ -1,6 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, contentChild, input, signal, TemplateRef } from '@angular/core';
-import { LucideInbox, LucideImage } from '@lucide/angular';
+import { LucideImage, LucideInbox } from '@lucide/angular';
 import { Modal } from '../modal';
 
 export interface TableColumn {

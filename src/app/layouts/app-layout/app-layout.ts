@@ -10,6 +10,7 @@ import {
   LucideImage,
   LucidePackage,
   LucideSettings,
+  LucideTag,
   LucideX,
 } from '@lucide/angular';
 import { AuthService } from '../../services/auth.service';
@@ -37,6 +38,7 @@ export class AppLayout {
     { label: 'Categorías', path: '/categories', icon: LucideFolderTree },
     { label: 'Productos', path: '/products', icon: LucidePackage },
     { label: 'Combos', path: '/combos', icon: LucideBoxes },
+    { label: 'Promociones', path: '/promotions', icon: LucideTag },
     { label: 'Galería', path: '/gallery', icon: LucideCalendarDays },
     { label: 'Banners', path: '/banners', icon: LucideImage },
     { label: 'Configuración', path: '/settings', icon: LucideSettings },

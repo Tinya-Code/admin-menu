@@ -1,0 +1,154 @@
+<div class="max-w-6xl">
+  <!-- Header with back button -->
+  <div class="flex items-center gap-4 mb-8">
+    <button
+      type="button"
+      class="p-2 -ml-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+      (click)="goBack()"
+      title="Volver"
+    >
+      <svg lucideArrowLeft class="w-5 h-5"></svg>
+    </button>
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">{{ pageTitle() }}</h1>
+      <p class="text-sm text-gray-500 mt-1">Administra las promociones del menú</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="space-y-6 animate-pulse">
+      <div class="h-10 bg-gray-200 rounded-lg w-1/3"></div>
+      <div class="h-64 bg-gray-100 rounded-xl"></div>
+      <div class="h-32 bg-gray-100 rounded-xl"></div>
+    </div>
+  } @else {
+    <form (ngSubmit)="save()" [formGroup]="promoForm">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- ===== LEFT: 3/5 ===== -->
+        <div class="lg:col-span-3 space-y-6">
+          <!-- Información -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 mb-4">Información de la Promoción</h3>
+            <div class="space-y-4">
+              <div>
+                <label for="promo-name" class="block text-sm font-medium text-gray-700 mb-1"
+                  >Nombre <span class="text-red-500">*</span></label
+                >
+                <input
+                  id="promo-name"
+                  formControlName="name"
+                  placeholder="Nombre de la promoción"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent placeholder:text-gray-400"
+                />
+              </div>
+              <div>
+                <label for="promo-desc" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                <textarea
+                  id="promo-desc"
+                  formControlName="description"
+                  rows="3"
+                  placeholder="Descripción de la promoción"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent placeholder:text-gray-400 resize-none"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Precios -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 mb-4">Precios</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="promo-base-price" class="block text-sm font-medium text-gray-700 mb-1">Precio base</label>
+                <div class="relative">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">S/</span>
+                  <input
+                    id="promo-base-price"
+                    type="number"
+                    min="0"
+                    formControlName="basePrice"
+                    placeholder="0.00"
+                    class="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent placeholder:text-gray-400"
+                  />
+                </div>
+              </div>
+              <div>
+                <label for="promo-price" class="block text-sm font-medium text-gray-700 mb-1"
+                  >Precio promocional <span class="text-red-500">*</span></label
+                >
+                <div class="relative">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">S/</span>
+                  <input
+                    id="promo-price"
+                    type="number"
+                    min="0"
+                    formControlName="promoPrice"
+                    placeholder="0.00"
+                    class="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent placeholder:text-gray-400"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vigencia -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 mb-4">Vigencia</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="promo-start" class="block text-sm font-medium text-gray-700 mb-1">Fecha inicio</label>
+                <input
+                  id="promo-start"
+                  type="date"
+                  formControlName="startDate"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label for="promo-end" class="block text-sm font-medium text-gray-700 mb-1">Fecha fin</label>
+                <input
+                  id="promo-end"
+                  type="date"
+                  formControlName="endDate"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== RIGHT: 2/5 ===== -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Imagen -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 mb-4">Imagen de la Promoción</h3>
+            <app-image-uploader
+              [currentUrl]="existingImageUrl()"
+              (onFileChange)="onImageChange($event)"
+              (onDelete)="onImageDelete($event)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
+        <button
+          type="button"
+          class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          (click)="goBack()"
+        >
+          Cancelar
+        </button>
+        <app-button
+          type="submit"
+          [loading]="saving()"
+          [disabled]="promoForm.invalid"
+        >
+          {{ isEditing() ? 'Guardar cambios' : 'Crear promoción' }}
+        </app-button>
+      </div>
+    </form>
+  }
+</div>

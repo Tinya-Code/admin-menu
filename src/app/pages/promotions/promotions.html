@@ -1,0 +1,120 @@
+<div class="max-w-5xl">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Promociones</h1>
+      <p class="text-sm text-gray-500 mt-1">Administra las promociones del menú</p>
+    </div>
+    <app-button (onClick)="openCreate()">
+      <svg lucidePlus class="w-4 h-4"></svg>
+      Nueva promoción
+    </app-button>
+  </div>
+
+  <!-- Search -->
+  <div class="mb-6 w-full md:max-w-xs">
+    <app-search-input
+      [searchTerm]="searchTerm()"
+      placeholder="Buscar promociones..."
+      (onSearch)="onSearch($event)"
+    />
+  </div>
+
+  <!-- Error -->
+  @if (apiError(); as error) {
+    <div
+      class="mb-6 flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700"
+    >
+      <svg lucideAlertTriangle class="w-5 h-5 shrink-0"></svg>
+      <div class="flex-1">{{ error }}</div>
+      <button
+        class="text-red-700 underline hover:text-red-800 whitespace-nowrap text-xs font-medium"
+        (click)="loadPromotions()"
+      >
+        Reintentar
+      </button>
+    </div>
+  }
+
+  <!-- Table -->
+  <app-table
+    [data]="promotions()"
+    [columns]="columns"
+    [loading]="loading()"
+    emptyTitle="No hay promociones"
+    emptySubtitle="Crea tu primera promoción para empezar"
+    [rowKey]="rowKey"
+    imageUrlField="imageUrl"
+  >
+    <ng-template #cell let-row let-col="column">
+      @switch (col.key) {
+        @case ('name') {
+          <p class="text-sm font-medium text-gray-900">{{ row.name }}</p>
+        }
+        @case ('prices') {
+          <div class="flex flex-col items-center gap-0.5">
+            <span class="text-xs text-gray-400 line-through">S/{{ (+row.basePrice).toFixed(2) }}</span>
+            <span class="text-sm font-semibold text-emerald-600">S/{{ (+row.promoPrice).toFixed(2) }}</span>
+          </div>
+        }
+        @case ('dates') {
+          <span class="text-xs text-gray-500">{{ formatDate(row.startDate) }} — {{ formatDate(row.endDate) }}</span>
+        }
+        @case ('actions') {
+          <div class="flex items-center justify-center gap-2">
+            <button
+              class="p-2 text-gray-400 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 rounded-lg transition-colors"
+              (click)="openEdit(row)"
+              title="Editar"
+            >
+              <svg lucidePencil class="w-4 h-4"></svg>
+            </button>
+            <button
+              class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              (click)="confirmDelete(row)"
+              title="Eliminar"
+            >
+              <svg lucideTrash2 class="w-4 h-4"></svg>
+            </button>
+          </div>
+        }
+      }
+    </ng-template>
+
+    <ng-template #mobileCard let-row>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-gray-900">{{ row.name }}</p>
+        <div class="flex items-center gap-2 mt-2">
+          <span class="text-xs text-gray-400 line-through">S/{{ (+row.basePrice).toFixed(2) }}</span>
+          <span class="text-sm font-semibold text-emerald-600">S/{{ (+row.promoPrice).toFixed(2) }}</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-1">{{ formatDate(row.startDate) }} — {{ formatDate(row.endDate) }}</p>
+      </div>
+      <div class="flex gap-1">
+        <button
+          class="p-2 text-gray-400 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 rounded-lg transition-colors"
+          (click)="openEdit(row)"
+        >
+          <svg lucidePencil class="w-4 h-4"></svg>
+        </button>
+        <button
+          class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          (click)="confirmDelete(row)"
+        >
+          <svg lucideTrash2 class="w-4 h-4"></svg>
+        </button>
+      </div>
+    </ng-template>
+  </app-table>
+</div>
+
+<!-- Delete Confirm -->
+<app-confirm-dialog
+  [open]="deleteDialogOpen()"
+  title="Eliminar promoción"
+  message="¿Estás seguro de eliminar esta promoción? Esta acción no se puede deshacer."
+  confirmText="Eliminar"
+  [loading]="deleting()"
+  (onConfirm)="executeDelete()"
+  (onCancel)="deleteDialogOpen.set(false)"
+/>

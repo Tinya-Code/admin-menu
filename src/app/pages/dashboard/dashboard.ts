@@ -1,13 +1,13 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CategoryService } from '../../services/category.service';
 import { ProductService } from '../../services/product.service';
-import { PromotionsTable } from './components/promotions-table/promotions-table';
 import {
   LucideDynamicIcon,
   LucideFolderTree,
   LucidePackage,
   LucideClipboardList,
   LucideTriangleAlert,
+  LucideSparkles,
 } from '@lucide/angular';
 
 interface StatCard {
@@ -21,7 +21,7 @@ interface StatCard {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [LucideDynamicIcon, LucideTriangleAlert, PromotionsTable],
+  imports: [LucideDynamicIcon, LucideTriangleAlert, LucideSparkles],
   templateUrl: './dashboard.html',
 })
 export class Dashboard implements OnInit {
