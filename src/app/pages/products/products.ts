@@ -44,8 +44,10 @@ export class Products implements OnInit {
   protected readonly pageSize = 10;
 
   protected columns: TableColumn[] = [
-    { key: 'image', header: 'Producto', width: '80px' },
-    { key: 'category', header: 'Categoría' },
+    { key: 'image', header: 'Imagen', width: '60px' },
+    { key: 'name', header: 'Nombre', width: '180px' },
+    { key: 'description', header: 'Descripción', width: '180px' },
+    { key: 'category', header: 'Categoría', width: '150px' },
     { key: 'price', header: 'Precio base', align: 'right', width: '120px' },
     { key: 'status', header: 'Estado', width: '100px' },
     { key: 'actions', header: 'Acciones', align: 'center', width: '120px' },
@@ -122,8 +124,9 @@ export class Products implements OnInit {
   }
 
   getDisplayPrice(prod: Product): string {
-    if (prod.price != null) {
-      return `S/${(+prod.price).toFixed(2)}`;
+    const hasPrice = prod.price != null && +prod.price > 0;
+    if (hasPrice) {
+      return `S/${(+prod.price!).toFixed(2)}`;
     }
     const ranges = prod.priceRanges;
     if (ranges && ranges.length > 0) {
