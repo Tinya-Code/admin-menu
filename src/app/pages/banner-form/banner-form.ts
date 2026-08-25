@@ -38,7 +38,7 @@ export class BannerForm implements OnInit {
 
   constructor() {
     this.bannerForm = this.fb.group({
-      title: ['', Validators.maxLength(255)],
+      title: ['', [Validators.required, Validators.maxLength(255)]],
       isActive: [true],
     });
   }
