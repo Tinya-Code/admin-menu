@@ -58,18 +58,18 @@
   >
     <ng-template #cell let-row let-col="column">
       @switch (col.key) {
-        @case ('image') {
-          <div>
-            <div class="flex items-center gap-1.5">
-              <p class="text-sm font-medium text-gray-900">{{ row.name }}</p>
-              @if (row.isRecommended) {
-                <span class="inline-flex items-center text-amber-500" title="Recomendado">
-                  <svg lucideStar class="w-3.5 h-3.5 fill-current"></svg>
-                </span>
-              }
-            </div>
-            <p class="text-xs text-gray-500 truncate max-w-[200px]">{{ row.description }}</p>
+        @case ('name') {
+          <div class="flex items-center gap-1.5">
+            <p class="text-sm font-medium text-gray-900">{{ row.name }}</p>
+            @if (row.isRecommended) {
+              <span class="inline-flex items-center text-amber-500" title="Recomendado">
+                <svg lucideStar class="w-3.5 h-3.5 fill-current"></svg>
+              </span>
+            }
           </div>
+        }
+        @case ('description') {
+          <p class="text-xs text-gray-500 truncate max-w-[200px]">{{ row.description }}</p>
         }
         @case ('category') {
           <span class="text-sm text-gray-600">{{ getCategoryName(row.categoryId) }}</span>
