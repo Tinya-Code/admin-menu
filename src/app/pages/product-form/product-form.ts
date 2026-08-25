@@ -14,13 +14,12 @@ import { CategoryService } from '../../services/category.service';
 import { ProductService } from '../../services/product.service';
 import { ToastService } from '../../services/toast.service';
 import { DayPrices, DayGroupData } from './components/day-prices';
-import { Promotions, PromotionData } from './components/promotions';
 import { VariantPrice, PriceRangeData } from './components/variant-price';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [ReactiveFormsModule, Button, ImageUploader, DayPrices, Promotions, VariantPrice],
+  imports: [ReactiveFormsModule, Button, ImageUploader, DayPrices, VariantPrice],
   templateUrl: './product-form.html',
 })
 export class ProductForm implements OnInit {
@@ -43,8 +42,6 @@ export class ProductForm implements OnInit {
   protected existingImageUrl = signal<string | null>(null);
 
   protected dayGroups = signal<DayGroupData[]>([]);
-
-  protected promotions = signal<PromotionData[]>([]);
 
   protected priceRanges = signal<PriceRangeData[]>([]);
 
@@ -106,7 +103,6 @@ export class ProductForm implements OnInit {
         });
 
         const dayPrices: DayGroupData[] = [];
-        const promos: PromotionData[] = [];
         for (const p of product.prices ?? []) {
           if (p.ruleType === 'DAY') {
             const start = p.startDay ?? 1;
@@ -120,19 +116,9 @@ export class ProductForm implements OnInit {
               days,
               price: Number(p.price),
             });
-          } else {
-            promos.push({
-              id: String(p.id),
-              name: p.name ?? 'Promoción',
-              description: p.description ?? '',
-              price: Number(p.price),
-              startDate: p.startDatetime ?? '',
-              endDate: p.endDatetime ?? '',
-            });
           }
         }
         this.dayGroups.set(dayPrices);
-        this.promotions.set(promos);
 
         const ranges: PriceRangeData[] = (product.priceRanges ?? []).map(
           (r: any) => ({
@@ -237,18 +223,6 @@ export class ProductForm implements OnInit {
           if (group.id) entry.id = group.id;
           prices.push(entry);
         }
-      }
-      for (const promo of this.promotions()) {
-        const entry: any = {
-          name: promo.name,
-          description: promo.description || null,
-          price: promo.price,
-          rule_type: 'PROMOTION',
-          start_datetime: promo.startDate ? promo.startDate.replace('T', ' ') + (promo.startDate.includes(':00') ? '' : ':00') : null,
-          end_datetime: promo.endDate ? promo.endDate.replace('T', ' ') + (promo.endDate.includes(':00') ? '' : ':00') : null,
-        };
-        if (promo.id) entry.id = promo.id;
-        prices.push(entry);
       }
       formData.append('prices', JSON.stringify(prices));
 

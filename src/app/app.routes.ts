@@ -45,6 +45,18 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/banners/banners').then((m) => m.Banners),
       },
       {
+        path: 'promotions',
+        loadComponent: () => import('./pages/promotions/promotions').then((m) => m.Promotions),
+      },
+      {
+        path: 'promotions/new',
+        loadComponent: () => import('./pages/promotions/promotion-form/promotion-form').then((m) => m.PromotionForm),
+      },
+      {
+        path: 'promotions/:id',
+        loadComponent: () => import('./pages/promotions/promotion-form/promotion-form').then((m) => m.PromotionForm),
+      },
+      {
         path: 'banners/new',
         loadComponent: () => import('./pages/banner-form/banner-form').then((m) => m.BannerForm),
       },
