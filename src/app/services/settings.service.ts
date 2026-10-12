@@ -96,13 +96,15 @@ export class SettingsService {
 
   /**
    * Calcula las diferencias entre el objeto original y el actualizado.
+   * Solo incluye campos que están explícitamente presentes en el objeto actualizado.
    * Si un valor ha sido vaciado o eliminado, devuelve `null` en lugar de `undefined`,
    * cumpliendo con la regla de backend para eliminar llaves en el deepMerge.
    */
   private calculateDiff(original: any, updated: any): any {
     const diff: any = {};
 
-    const keys = new Set([...Object.keys(original || {}), ...Object.keys(updated || {})]);
+    // Solo procesar las llaves que están en el objeto actualizado
+    const keys = Object.keys(updated || {});
 
     for (const key of keys) {
       const origVal = original ? original[key] : undefined;
